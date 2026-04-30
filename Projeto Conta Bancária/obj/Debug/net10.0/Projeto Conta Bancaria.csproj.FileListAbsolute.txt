@@ -1,0 +1,15 @@
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\bin\Debug\net10.0\Projeto Conta Bancaria.exe
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\bin\Debug\net10.0\Projeto Conta Bancaria.deps.json
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\bin\Debug\net10.0\Projeto Conta Bancaria.runtimeconfig.json
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\bin\Debug\net10.0\Projeto Conta Bancaria.dll
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\bin\Debug\net10.0\Projeto Conta Bancaria.pdb
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\Projeto Conta Bancaria.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\Projeto Conta Bancaria.AssemblyInfoInputs.cache
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\Projeto Conta Bancaria.AssemblyInfo.cs
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\Projeto Conta Bancaria.csproj.CoreCompileInputs.cache
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\Projeto Conta Bancaria.sourcelink.json
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\Projeto Conta Bancaria.dll
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\refint\Projeto Conta Bancaria.dll
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\Projeto Conta Bancaria.pdb
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\Projeto Conta Bancaria.genruntimeconfig.cache
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Conta Bancária\obj\Debug\net10.0\ref\Projeto Conta Bancaria.dll
