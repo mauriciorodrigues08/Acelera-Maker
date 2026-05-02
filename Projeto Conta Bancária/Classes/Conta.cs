@@ -87,6 +87,7 @@ public abstract class Conta
         if (_valor > 0)
         {
             setSaldo(getSaldo() + _valor);
+            System.Console.WriteLine($"Depósito de R${_valor} realizado com sucesso!");
         }
     }
 }
