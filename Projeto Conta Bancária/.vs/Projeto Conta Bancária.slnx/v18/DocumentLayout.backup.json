@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Conta Banc\u00E1ria\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{74357FEA-A221-CA47-9D0D-DE63E8BAD47F}|Projeto Conta Banc\u00E1ria.csproj|c:\\users\\mauri\\onedrive\\documentos\\github\\acelera-maker\\projeto conta banc\u00E1ria\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74357FEA-A221-CA47-9D0D-DE63E8BAD47F}|Projeto Conta Banc\u00E1ria.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3872FF26-A221-1882-A970-455C0CA47F59}|Projeto Conta Bancaria.csproj|c:\\users\\mauri\\onedrive\\documentos\\github\\acelera-maker\\projeto conta banc\u00E1ria\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3872FF26-A221-1882-A970-455C0CA47F59}|Projeto Conta Bancaria.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{74357FEA-A221-CA47-9D0D-DE63E8BAD47F}|Projeto Conta Bancaria.csproj|c:\\users\\mauri\\onedrive\\documentos\\github\\acelera-maker\\projeto conta banc\u00E1ria\\classes\\contapoupanca.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74357FEA-A221-CA47-9D0D-DE63E8BAD47F}|Projeto Conta Bancaria.csproj|solutionrelative:classes\\contapoupanca.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3872FF26-A221-1882-A970-455C0CA47F59}|Projeto Conta Bancaria.csproj|c:\\users\\mauri\\onedrive\\documentos\\github\\acelera-maker\\projeto conta banc\u00E1ria\\classes\\contapoupanca.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3872FF26-A221-1882-A970-455C0CA47F59}|Projeto Conta Bancaria.csproj|solutionrelative:classes\\contapoupanca.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{74357FEA-A221-CA47-9D0D-DE63E8BAD47F}|Projeto Conta Banc\u00E1ria.csproj|c:\\users\\mauri\\onedrive\\documentos\\github\\acelera-maker\\projeto conta banc\u00E1ria\\classes\\contacorrente.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74357FEA-A221-CA47-9D0D-DE63E8BAD47F}|Projeto Conta Banc\u00E1ria.csproj|solutionrelative:classes\\contacorrente.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3872FF26-A221-1882-A970-455C0CA47F59}|Projeto Conta Bancaria.csproj|c:\\users\\mauri\\onedrive\\documentos\\github\\acelera-maker\\projeto conta banc\u00E1ria\\classes\\contacorrente.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3872FF26-A221-1882-A970-455C0CA47F59}|Projeto Conta Bancaria.csproj|solutionrelative:classes\\contacorrente.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{74357FEA-A221-CA47-9D0D-DE63E8BAD47F}|Projeto Conta Bancaria.csproj|c:\\users\\mauri\\onedrive\\documentos\\github\\acelera-maker\\projeto conta banc\u00E1ria\\classes\\conta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74357FEA-A221-CA47-9D0D-DE63E8BAD47F}|Projeto Conta Bancaria.csproj|solutionrelative:classes\\conta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3872FF26-A221-1882-A970-455C0CA47F59}|Projeto Conta Bancaria.csproj|c:\\users\\mauri\\onedrive\\documentos\\github\\acelera-maker\\projeto conta banc\u00E1ria\\classes\\conta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3872FF26-A221-1882-A970-455C0CA47F59}|Projeto Conta Bancaria.csproj|solutionrelative:classes\\conta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,8 +38,7 @@
               "RelativeToolTip": "Classes\\ContaPoupanca.cs",
               "ViewState": "AgIAAB8AAAAAAAAAAAAkwC4AAABMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-30T11:08:42.844Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-30T11:08:42.844Z"
             },
             {
               "$type": "Document",
@@ -51,8 +50,7 @@
               "RelativeToolTip": "Classes\\ContaCorrente.cs",
               "ViewState": "AgIAADoAAAAAAAAAAAAkwDcAAABMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-30T10:59:16.282Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-30T10:59:16.282Z"
             },
             {
               "$type": "Document",
@@ -64,8 +62,7 @@
               "RelativeToolTip": "Classes\\Conta.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-30T11:07:15.826Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-30T11:07:15.826Z"
             },
             {
               "$type": "Document",
@@ -75,7 +72,7 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Conta Banc\u00E1ria\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAABkAAAAAAAAAAAAQwCQAAAAcAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-30T11:00:55.254Z",
               "EditorCaption": ""

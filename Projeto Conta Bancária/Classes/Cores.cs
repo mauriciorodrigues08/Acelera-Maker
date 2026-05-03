@@ -17,32 +17,23 @@ public static class Cores
     private const string TextoCiano    = "\u001b[36m";
     private const string TextoBranco   = "\u001b[37m";
  
-    // Cores de fundo
-    private const string FundoPreto    = "\u001b[40m";
-    private const string FundoVermelho = "\u001b[41m";
-    private const string FundoVerde    = "\u001b[42m";
-    private const string FundoAmarelo  = "\u001b[43m";
-    private const string FundoAzul     = "\u001b[44m";
-    private const string FundoMagenta  = "\u001b[45m";
-    private const string FundoCiano    = "\u001b[46m";
-    private const string FundoBranco   = "\u001b[47m";
 
     // ======== Impressão de textos ========
     // Imprime o texto na cor indicada, seguido de nova linha
-    public static void WriteLine(string texto, string cor)
+    public static void WriteLine(string texto, string cor = TextoBranco)
     {
         Console.WriteLine($"{cor}{texto}{Reset}");
     }
  
     // Imprime o texto na cor indicada, sem nova linha
-    public static void Write(string texto, string cor)
+    public static void Write(string texto, string cor = TextoBranco)
     {
         Console.Write($"{cor}{texto}{Reset}");
     }
 
     // ======== Atalhos prontos para uso no Menu ========
     public static void Titulo(string texto)
-        => Console.WriteLine($"{Negrito}{TextoCiano}{texto}{Reset}");
+        => Console.WriteLine($"{Negrito}{TextoBranco}{texto}{Reset}");
  
     public static void Sucesso(string texto)
         => Console.WriteLine($"{Negrito}{TextoVerde}{texto}{Reset}");
@@ -62,18 +53,18 @@ public static class Cores
 
     // ======== Utilitários de formatação do Menu ========
     // Imprime uma linha separadora colorida
-    public static void Separador(char caractere = '*', int tamanho = 60, string? cor = null)
+    public static void Separador(char caractere = '*', int tamanho = 50, string? cor = null)
     {
         string linha = new string(caractere, tamanho);
-        Console.WriteLine($"{cor ?? TextoCiano}{linha}{Reset}");
+        Console.WriteLine($"{cor ?? TextoBranco}{linha}{Reset}");
     }
  
     // Imprime o cabeçalho do menu centralizado com separadores
-    public static void Cabecalho(string titulo, int largura = 60)
+    public static void Cabecalho(string titulo, int largura = 50)
     {
         Separador('*', largura);
         string centralizado = titulo.PadLeft((largura + titulo.Length) / 2).PadRight(largura);
-        Console.WriteLine($"{Negrito}{FundoAzul}{TextoBranco}{centralizado}{Reset}");
+        Console.WriteLine($"{Negrito}{TextoBranco}{centralizado}{Reset}");
         Separador('*', largura);
         Console.WriteLine();
     }

@@ -30,7 +30,7 @@ public class ContaPoupanca : Conta
     // vizualizar
     public override void visualizar()
     {
-        Cores.Info("# EXIBINDO DADOS DO CLIENTE #");
+        Cores.Titulo("- EXIBINDO DADOS DO CLIENTE -");
         Cores.Info($"Titular: {this.getTitular()}");
         Cores.Info($"Tipo: {this.getTipo()}");
         Cores.Info($"Número: {this.getNumero()}");
