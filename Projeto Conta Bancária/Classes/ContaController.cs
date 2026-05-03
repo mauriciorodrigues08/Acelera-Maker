@@ -94,10 +94,27 @@ public class ContaController : IContaRepository
             return;
         }
 
-        // caso exista, deleta e notifica
-        contasCadastradas.RemoveAt(contasCadastradas.IndexOf(contaExistente));
+        // caso exista, pede confirmação
+        contaExistente.visualizar();
+        Cores.Aviso("Tem certeza que deseja deletar essa conta? (S/N): ");
+        string? confirmacao = Console.ReadLine();
 
-        Cores.Sucesso($"Conta de número {_numero} deletada com sucesso!\n");
+        // se confirmar, exclui
+        if (confirmacao == "S")
+        {
+            contasCadastradas.RemoveAt(contasCadastradas.IndexOf(contaExistente));
+            Cores.Sucesso($"Conta de número {_numero} deletada com sucesso!\n");
+        }
+        // caso não confirmar, ou digitar chave inválida, cancela
+        else if (confirmacao == "N")
+        {
+            Cores.Erro("Operação Cancelada!");
+        }
+        else
+        {
+            Cores.Erro("Chave inválida! Operação Cancelada!");
+        }
+
     }
 
     // CHAMA O MÉTODO SACAR

@@ -24,7 +24,7 @@ public class Menu
                 // Sair
                 case 0:
                     Cores.Separador();
-                    Cores.Info("Programa finalizado...");
+                    Cores.Info("\nPrograma finalizado...");
                     break;
 
                 // Cadastrar
@@ -154,42 +154,122 @@ public class Menu
     private void listar(ContaController controller) 
     {
         Console.Clear();
+        Cores.Cabecalho("- LISTANDO CONTAS CADASTRADAS -");
+
+        controller.listarTodas();
+
         Cores.Separador();
-        Cores.Cabecalho("");
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
     }
 
     private void atualizar(ContaController controller) 
     {
         Console.Clear();
-        Cores.Separador();
-        Cores.Cabecalho("");
+        Cores.Cabecalho("- ATUALIZANDO CONTA -");
+
+        // recebe o número da conta que será atualizada
+        
+        // recebe os novos dados
+                
+        // envia para o controller
+        
     }
 
     private void deletar(ContaController controller) 
     {
         Console.Clear();
+        Cores.Cabecalho("- DELETANDO CONTA -");
+
+        // recebe numero da conta que será deletada
+        Cores.Write("Informe o número da conta: ");
+        int numero = Convert.ToInt32(Console.ReadLine());
+
+        // passa para o controller
+        controller.deletar(numero);
+
         Cores.Separador();
-        Cores.Cabecalho("");
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
     }
 
     private void sacar(ContaController controller) 
     {
         Console.Clear();
+        Cores.Cabecalho("- REALIZANDO SAQUE -");
+
+        // recebe o número da conta
+        Cores.Write("Informe o número da conta: ");
+        int numero = Convert.ToInt32(Console.ReadLine());
+
+        // recebe o valor do saque
+        Cores.Write("Informe o valor do saque: ");
+        float valor;
+        while (!float.TryParse(Console.ReadLine(), out valor))
+        {   
+            Cores.Erro("Valor inválido! Digite novamente: ");
+        }
+
+        // passa para o controller
+        controller.sacar(numero, valor);
+
         Cores.Separador();
-        Cores.Cabecalho("");
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
     }
 
     private void depositar(ContaController controller) 
     {
         Console.Clear();
+        Cores.Cabecalho("- REALIZANDO DEPÓSITO -");
+
+        // recebe o número da conta
+        Cores.Write("Informe o número da conta: ");
+        int numero = Convert.ToInt32(Console.ReadLine());
+
+        // recebe o valor do depósito
+        Cores.Write("Informe o valor do depósito: ");
+        float valor;
+        while (!float.TryParse(Console.ReadLine(), out valor))
+        {   
+            Cores.Erro("Valor inválido! Digite novamente: ");
+        }
+
+        // passa para o controller
+        controller.depositar(numero, valor);
+
         Cores.Separador();
-        Cores.Cabecalho("");
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
     }
 
     private void transferir(ContaController controller) 
     {
         Console.Clear();
+        Cores.Cabecalho("- REALIZANDO TRANSFERÊNCIA -");
+
+        // recebe a conta de origem
+        Cores.Write("Informe o número da conta de Origem: ");
+        int numeroOrigem = Convert.ToInt32(Console.ReadLine());
+
+        // recebe a conta de destino
+        Cores.Write("Informe o número da conta de Destino: ");
+        int numeroDestino = Convert.ToInt32(Console.ReadLine());
+        
+        // recebe o valor da transação
+        Cores.Write("Informe o valor da transação: ");
+        float valor;
+        while (!float.TryParse(Console.ReadLine(), out valor))
+        {   
+            Cores.Erro("Valor inválido! Digite novamente: ");
+        }
+
+        // passa para o controller
+        controller.transferir(numeroOrigem, numeroDestino, valor);
+
         Cores.Separador();
-        Cores.Cabecalho("");
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
     }
+
 }

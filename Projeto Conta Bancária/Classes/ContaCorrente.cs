@@ -70,7 +70,7 @@ public class ContaCorrente : Conta
     public override void visualizar(){
         Cores.Titulo("- EXIBINDO DADOS DO CLIENTE -");
         Cores.Info($"Titular: {this.getTitular()}");
-        Cores.Info($"Tipo: {this.getTipo()}");
+        Cores.Info($"Tipo: Corrente");
         Cores.Info($"Número: {this.getNumero()}");
         Cores.Info($"Agência: {this.getAgencia()}");
         Cores.Info($"Saldo: R${this.getSaldo()}");
