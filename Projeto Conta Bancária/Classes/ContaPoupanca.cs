@@ -1,4 +1,6 @@
 namespace Projeto_Conta_Bancaria.Classes;
+
+//imports
 using System;
 
 public class ContaPoupanca : Conta
@@ -26,28 +28,33 @@ public class ContaPoupanca : Conta
     }
     
     // vizualizar
-    public void visualizar()
+    public override void visualizar()
     {
-        Console.WriteLine("# EXIBINDO DADOS DO CLIENTE #");
-        Console.WriteLine($"Titular: {this.getTitular()}");
-        Console.WriteLine($"Tipo: {this.getTipo()}");
-        Console.WriteLine($"Número: {this.getNumero()}");
-        Console.WriteLine($"Agência: {this.getAgencia()}");
-        Console.WriteLine($"Saldo: R${this.getSaldo()}");
-        Console.WriteLine($"Aniversário: {this.getAniversario()}");
-        Console.WriteLine();
+        Cores.Info("# EXIBINDO DADOS DO CLIENTE #");
+        Cores.Info($"Titular: {this.getTitular()}");
+        Cores.Info($"Tipo: {this.getTipo()}");
+        Cores.Info($"Número: {this.getNumero()}");
+        Cores.Info($"Agência: {this.getAgencia()}");
+        Cores.Info($"Saldo: R${this.getSaldo()}");
+        Cores.Info($"Aniversário: {this.getAniversario()}\n");
     }
 
     // sacar
     public override bool sacar(float _valor)
     {
+        // verifica se é possível realizar o saque
         if (_valor > 0 && _valor <= getSaldo())
         {
+            // realiza o saque
             setSaldo(getSaldo() - _valor);
-            Console.WriteLine($"Saque de R${_valor} realizado com sucesso!\n");
+
+            // retorna mensagem de sucesso
+            Cores.Sucesso($"Saque de R${_valor} realizado com sucesso!\n");
             return true;
         }
-        Console.WriteLine($"Não foi possível realizar o saque de R${_valor}. Saldo insuficiente!\n");
+
+        // retorna mensagem de erro
+        Cores.Erro($"Não foi possível realizar o saque de R${_valor}. Saldo insuficiente!\n");
         return false;
     }
 }

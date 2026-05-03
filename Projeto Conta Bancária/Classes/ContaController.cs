@@ -1,5 +1,6 @@
 namespace Projeto_Conta_Bancaria.Classes;
-using System;
+
+// imports
 using System.Collections.Generic;
 
 public class ContaController : IContaRepository
@@ -12,7 +13,7 @@ public class ContaController : IContaRepository
     {
         contasCadastradas.Add(_conta);
         
-        System.Console.WriteLine($"Conta de número {_conta.getNumero()} cadastrada com sucesso!\n");
+        Cores.Sucesso($"Conta de número {_conta.getNumero()} cadastrada com sucesso!\n");
     }
 
     // GERA UM NÚMERO AUTOMÁTICO PARA A CONTA
@@ -34,12 +35,12 @@ public class ContaController : IContaRepository
             contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = _conta;
 
             // notifica sucesso
-            System.Console.WriteLine($"Conta de número {_conta.getNumero()} atualizada com sucesso!\n");
+            Cores.Sucesso($"Conta de número {_conta.getNumero()} atualizada com sucesso!\n");
         }
         else
         {
             // notifica o erro
-            System.Console.WriteLine($"Erro! Conta de número {_conta.getNumero()} não está cadastrada.\n");
+            Cores.Erro($"Erro! Conta de número {_conta.getNumero()} não está cadastrada.\n");
         }
     }
 
@@ -52,21 +53,12 @@ public class ContaController : IContaRepository
         // caso exista, verifica o tipo de conta e visualiza
         if (contaExistente != null)
         {
-            switch (contaExistente.getTipo())
-            {
-                case 1:
-                    ((ContaCorrente)contaExistente).visualizar();
-                    break;
-
-                case 2:
-                    ((ContaPoupanca)contaExistente).visualizar();
-                    break;
-            }
+            contaExistente.visualizar();
         }
         else
         {
             // notifica o erro
-            System.Console.WriteLine($"Conta de número {_numero} não encontrada!\n");
+            Cores.Erro($"Conta de número {_numero} não encontrada!\n");
         }
     }
 
@@ -76,7 +68,7 @@ public class ContaController : IContaRepository
         // verifica se não existem contas cadastradas
         if (contasCadastradas.Count == 0)
         {
-            System.Console.WriteLine("Não existem contas cadastradas até o momento!\n");
+            Cores.Info("Não existem contas cadastradas até o momento!\n");
             
             return;
         }
@@ -84,16 +76,7 @@ public class ContaController : IContaRepository
         // caso existam, percorre a coleção imprimindo as contas
         foreach (Conta conta in contasCadastradas)
         {
-            switch (conta.getTipo())
-            {
-                case 1:
-                    ((ContaCorrente)conta).visualizar();
-                    break;
-                    
-                case 2:
-                    ((ContaPoupanca)conta).visualizar();
-                    break;
-            }
+            conta.visualizar();
         }
     }
 
@@ -106,7 +89,7 @@ public class ContaController : IContaRepository
         // caso não exista, notifica
         if (contaExistente == null)
         {
-            System.Console.WriteLine($"Conta de número {_numero} não está cadastrada!\n");
+            Cores.Erro($"Conta de número {_numero} não está cadastrada!\n");
 
             return;
         }
@@ -114,7 +97,7 @@ public class ContaController : IContaRepository
         // caso exista, deleta e notifica
         contasCadastradas.RemoveAt(contasCadastradas.IndexOf(contaExistente));
 
-        System.Console.WriteLine($"Conta de número {_numero} deletada com sucesso!\n");
+        Cores.Sucesso($"Conta de número {_numero} deletada com sucesso!\n");
     }
 
     // CHAMA O MÉTODO SACAR
@@ -126,7 +109,7 @@ public class ContaController : IContaRepository
         // caso não exista
         if (contaExistente == null)
         {
-            System.Console.WriteLine($"Conta de número {_numero} não está cadastrada!\n");
+            Cores.Erro($"Conta de número {_numero} não está cadastrada!\n");
 
             return;
         }
@@ -144,7 +127,7 @@ public class ContaController : IContaRepository
         // caso não exista
         if (contaExistente == null)
         {
-            System.Console.WriteLine($"Conta de número {_numero} não está cadastrada!\n");
+            Cores.Erro($"Conta de número {_numero} não está cadastrada!\n");
 
             return;
         }
@@ -160,7 +143,7 @@ public class ContaController : IContaRepository
         Conta? contaOrigem = buscarNaCollection(_numeroOrigem);
         if (contaOrigem == null)
         {
-            System.Console.WriteLine($"Conta de número {_numeroOrigem} não está cadastrada!\n");
+            Cores.Erro($"Conta de número {_numeroOrigem} não está cadastrada!\n");
 
             return;
         }
@@ -168,7 +151,7 @@ public class ContaController : IContaRepository
         Conta? contaDestino = buscarNaCollection(_numeroDestino);
         if (contaDestino == null)
         {
-            System.Console.WriteLine($"Conta de número {_numeroDestino} não está cadastrada!\n");
+            Cores.Erro($"Conta de número {_numeroDestino} não está cadastrada!\n");
 
             return;
         }
@@ -179,6 +162,7 @@ public class ContaController : IContaRepository
 
         // caso o saque seja feito, credita na conta de destino
         contaDestino.depositar(_valor);
+        Cores.Sucesso($"Transferência de R${_valor} concluída com sucesso!");
     }
 
     // BUSCA UMA CONTA NA BASE DE DADOS

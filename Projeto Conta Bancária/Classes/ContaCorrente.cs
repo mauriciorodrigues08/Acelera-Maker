@@ -1,4 +1,6 @@
 namespace Projeto_Conta_Bancaria.Classes;
+
+// imports
 using System;
 
 public class ContaCorrente : Conta
@@ -53,26 +55,25 @@ public class ContaCorrente : Conta
             }
             
             // mensagem de confirmação
-            Console.WriteLine($"Saque de R${_valor} realizado com sucesso!\n");
+            Cores.Sucesso($"Saque de R${_valor} realizado com sucesso!");
 
             return true;
         }
 
         // mensagem de erro
-        Console.WriteLine($"Não foi possível realizar o saque de R${_valor}. Saldo/Limite insuficiente!\n");
+        Cores.Erro($"Não foi possível realizar o saque de R${_valor}. Saldo/Limite insuficiente!");
 
         return false;
     }
 
     // vizualizar
-    public void visualizar(){
-        Console.WriteLine("# EXIBINDO DADOS DO CLIENTE #");
-        Console.WriteLine($"Titular: {this.getTitular()}");
-        Console.WriteLine($"Tipo: {this.getTipo()}");
-        Console.WriteLine($"Número: {this.getNumero()}");
-        Console.WriteLine($"Agência: {this.getAgencia()}");
-        Console.WriteLine($"Saldo: R${this.getSaldo()}");
-        Console.WriteLine($"Limite: R${this.getLimite()}");
-        Console.WriteLine();
+    public override void visualizar(){
+        Cores.Info("# EXIBINDO DADOS DO CLIENTE #");
+        Cores.Info($"Titular: {this.getTitular()}");
+        Cores.Info($"Tipo: {this.getTipo()}");
+        Cores.Info($"Número: {this.getNumero()}");
+        Cores.Info($"Agência: {this.getAgencia()}");
+        Cores.Info($"Saldo: R${this.getSaldo()}");
+        Cores.Info($"Limite: R${this.getLimite()}\n");
     }
 }
