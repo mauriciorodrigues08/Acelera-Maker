@@ -10,13 +10,18 @@ using System.Text.Json.Serialization;
 public abstract class Conta
 {
     //atributos (liberados para acesso do json)
-    [JsonInclude] private string titular;
-    [JsonInclude] private int tipo;
-    [JsonInclude] private int numero;
-    [JsonInclude] private int agencia;
-    [JsonInclude] private float saldo;
+    [JsonInclude] internal string titular;
+    [JsonInclude] internal int tipo;
+    [JsonInclude] internal int numero;
+    [JsonInclude] internal int agencia;
+    [JsonInclude] internal float saldo;
 
-    // construtor
+    // construtores
+
+    public Conta()
+    {
+        this.titular = "";
+    }
     public Conta(int _numero = 0, int _agencia = 0, int _tipo = 0, string _titular = "", float _saldo = 0)
     {
         numero = _numero;

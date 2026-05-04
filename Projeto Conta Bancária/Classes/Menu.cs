@@ -4,11 +4,12 @@ namespace Projeto_Conta_Bancaria.Classes;
 using System;
 public class Menu
 {
-    private ContaController controller = new ContaController();
-
     // inicia um Menu
     public void Iniciar()
     {
+        // variável de controle
+        ContaController controller = new ContaController();
+
         // variável auxiliar para opção
         int op;
 
@@ -176,11 +177,15 @@ public class Menu
         Cores.Cabecalho("- ATUALIZANDO CONTA -");
 
         // recebe o número da conta que será atualizada
-        
-        // recebe os novos dados
-                
+        Cores.Write("Informe o número da conta: ");
+        int numero = Convert.ToInt32(Console.ReadLine());
+
         // envia para o controller
-        
+        controller.atualizar(numero);
+    
+        Cores.Separador();
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
     }
 
     private void deletar(ContaController controller) 

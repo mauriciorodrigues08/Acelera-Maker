@@ -7,9 +7,11 @@ using System.Text.Json.Serialization;
 public class ContaPoupanca : Conta
 {
     // atributos
-    [JsonInclude] private int aniversario;
+    [JsonInclude] internal int aniversario;
     
-    // construtor
+    // construtores
+    public ContaPoupanca() : base() { }
+
     public ContaPoupanca(int _numero, int _agencia, int _tipo, string _titular, float _saldo, int _aniversario)
         : base(_numero, _agencia, _tipo, _titular, _saldo)
     {

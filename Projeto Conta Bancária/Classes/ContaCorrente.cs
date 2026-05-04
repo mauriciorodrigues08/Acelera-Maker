@@ -7,9 +7,11 @@ using System.Text.Json.Serialization;
 public class ContaCorrente : Conta
 {
     // atributos
-    [JsonInclude] private float limite;
+    [JsonInclude] internal float limite;
     
-    // construtor
+    // construtores
+
+    public ContaCorrente() : base() { }
     public ContaCorrente(int _numero, int _agencia, int _tipo, string _titular, float _saldo, float _limite)
         : base(_numero, _agencia, _tipo, _titular, _saldo)
     {

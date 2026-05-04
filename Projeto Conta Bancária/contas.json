@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "tipoConta": "corrente",
+    "limite": 2000,
+    "titular": "mauricio",
+    "tipo": 1,
+    "numero": 1,
+    "agencia": 11,
+    "saldo": 500
+  },
+  {
+    "tipoConta": "poupanca",
+    "aniversario": 2001,
+    "titular": "maria",
+    "tipo": 2,
+    "numero": 2,
+    "agencia": 22,
+    "saldo": 0
+  }
+]

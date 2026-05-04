@@ -7,20 +7,20 @@ using System.Text.Json;
 public class ContaController : IContaRepository
 {
     // caminho do arquivo json para Persistência de Dados
-    private static readonly string CAMINHO_ARQUIVO = Path.Combine(
+    internal static readonly string CAMINHO_ARQUIVO = Path.Combine(
         AppContext.BaseDirectory, // caminho atual (Projeto\bin\Debug\net10.0)
         "../../../contas.json" // volta 3 diretórios e acessa o arquivo na pasta base (Projeto)
     );
 
     // configurações para o json
-    private static readonly JsonSerializerOptions JSON_OPTIONS = new()
+    internal static readonly JsonSerializerOptions JSON_OPTIONS = new()
     {
         WriteIndented = true, // adiciona quebras de linha ao arquivo
         PropertyNameCaseInsensitive = true // ignora maiúsculas e minúsculas (case insensitive)
     };
 
     // lista para armazenar todas as Contas
-    private List<Conta> contasCadastradas = new();
+    internal List<Conta> contasCadastradas = new();
 
     // CONSTRUTOR
     public ContaController()
@@ -52,24 +52,81 @@ public class ContaController : IContaRepository
     }
 
     // ATUALIZAR UMA CONTA
-    public void atualizar (Conta _conta)
+    public void atualizar (int _numero)
     {
         // verifica se a conta está cadastrada
-        Conta? contaExistente = buscarNaCollection(_conta.getNumero());
+        Conta? contaExistente = buscarNaCollection(_numero);
 
         // caso exista, atualiza seus valores
         if (contaExistente != null)
         {
+            // cria a conta com as informações atualizadas
+            Conta contaAtt;
+
+            // recebe o novo titular
+            Cores.Write("Informe o novo titular: ");
+            string? titularAtt = null;
+            while(titularAtt == null)
+            {
+                titularAtt = Console.ReadLine();
+            }
+
+            // verifica se é conta corrente (tipo = 1)
+            if (contaExistente.getTipo() == 1)
+            {
+                // recebe o novo limite
+                float limiteAtt;
+                Cores.Write("Informe o novo limite: ");
+                while (!float.TryParse(Console.ReadLine(), out limiteAtt))
+                {   
+                    Cores.Erro("Valor inválido!");
+                    Cores.Write("Digite novamente: ");
+                }
+
+                contaAtt = new ContaCorrente
+                (
+                    contaExistente.getNumero(),  // numero
+                    contaExistente.getAgencia(), // agencia
+                    1,                           // tipo
+                    titularAtt,                  // novo titular
+                    contaExistente.getSaldo(),   // saldo
+                    limiteAtt                    // novo limite
+                );
+            }
+            // verifica se é conta poupança (tipo = 2)
+            else
+            {
+                // novo aniversário
+                Cores.Write("Informe o novo aniversário: ");
+                int aniversarioAtt = Convert.ToInt32(Console.ReadLine());
+                while (aniversarioAtt < 1900)
+                {
+                    Cores.Erro("Valor inválido!");
+                    Cores.Write("Digite novamente: ");
+                }
+
+                // instancia a nova conta atualizada
+                contaAtt = new ContaPoupanca
+                (
+                    contaExistente.getNumero(),  // numero
+                    contaExistente.getAgencia(), // agencia
+                    2,                           // tipo
+                    titularAtt,                  // novo titular
+                    contaExistente.getSaldo(),   // saldo
+                    aniversarioAtt               // novo aniversário
+                );
+            }
+
             // atualiza o índice da conta na coleção
-            contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = _conta;
+            contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = contaAtt;
 
             // notifica sucesso
-            Cores.Sucesso($"Conta de número {_conta.getNumero()} atualizada com sucesso!\n");
+            Cores.Sucesso($"Conta de número {_numero} atualizada com sucesso!\n");
         }
         else
         {
             // notifica o erro
-            Cores.Erro($"Erro! Conta de número {_conta.getNumero()} não está cadastrada.\n");
+            Cores.Erro($"Erro! Conta de número {_numero} não está cadastrada.\n");
         }
 
         // salva no json
@@ -257,11 +314,8 @@ public class ContaController : IContaRepository
             // verifica se a coleção gerada é válida
             if (colecao != null)
             {
-                // carrega os dados na coleção contasCadastradas
+                // carrega os dados importados na coleção contasCadastradas
                 contasCadastradas = colecao;
-
-                // notifica sucesso
-                Cores.Sucesso("Carregamento json concluído com sucesso!");
             }
         }
         // trata exceção (falha na coleta dos dados)
