@@ -35,7 +35,7 @@ public class ContaCorrente : Conta
     }
 
     // sacar
-    public override bool sacar(float _valor)
+    public override bool sacar(float _valor, bool transf = false)
     {
         // verifica se é possível realizar o saque
         if ( (_valor > 0) && (_valor <= this.getSaldo() + getLimite()) )
@@ -54,8 +54,12 @@ public class ContaCorrente : Conta
                 this.setSaldo(this.getSaldo() - _valor);
             }
             
-            // mensagem de confirmação
-            Cores.Sucesso($"Saque de R${_valor} realizado com sucesso!");
+            // verifica se o saque é parte de uma transação
+            if (!transf)
+            {
+                // se não for, retorna mensagem de confirmação
+                Cores.Sucesso($"Saque de R${_valor} realizado com sucesso!");
+            }
 
             return true;
         }

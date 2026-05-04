@@ -40,7 +40,7 @@ public class ContaPoupanca : Conta
     }
 
     // sacar
-    public override bool sacar(float _valor)
+    public override bool sacar(float _valor, bool transf = false)
     {
         // verifica se é possível realizar o saque
         if (_valor > 0 && _valor <= getSaldo())
@@ -48,9 +48,13 @@ public class ContaPoupanca : Conta
             // realiza o saque
             setSaldo(getSaldo() - _valor);
 
-            // retorna mensagem de sucesso
-            Cores.Sucesso($"Saque de R${_valor} realizado com sucesso!\n");
-            return true;
+            // verifica se o saque é parte de uma transação
+            if (!transf)
+            {   
+                // se não for, retorna mensagem de sucesso
+                Cores.Sucesso($"Saque de R${_valor} realizado com sucesso!\n");
+                return true;
+            }
         }
 
         // retorna mensagem de erro

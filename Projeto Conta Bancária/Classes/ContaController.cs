@@ -161,7 +161,6 @@ public class ContaController : IContaRepository
         if (contaOrigem == null)
         {
             Cores.Erro($"Conta de número {_numeroOrigem} não está cadastrada!\n");
-
             return;
         }
 
@@ -169,16 +168,15 @@ public class ContaController : IContaRepository
         if (contaDestino == null)
         {
             Cores.Erro($"Conta de número {_numeroDestino} não está cadastrada!\n");
-
             return;
         }
 
         // verifica se a Conta de Origem possui o valor desejado
-        bool saqueRealizado = contaOrigem.sacar(_valor);
+        bool saqueRealizado = contaOrigem.sacar(_valor, true);
         if (!saqueRealizado) return;
 
         // caso o saque seja feito, credita na conta de destino
-        contaDestino.depositar(_valor);
+        contaDestino.depositar(_valor, true);
         Cores.Sucesso($"Transferência de R${_valor} concluída com sucesso!");
     }
 

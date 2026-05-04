@@ -79,15 +79,21 @@ public abstract class Conta
     }
 
     // sacar
-    public abstract bool sacar(float _valor);
+    public abstract bool sacar(float _valor, bool transf = false);
 
     //depositar
-    public void depositar(float _valor)
+    public void depositar(float _valor, bool transf = false)
     {
         if (_valor > 0)
         {
             setSaldo(getSaldo() + _valor);
-            Cores.Sucesso($"Depósito de R${_valor} realizado com sucesso!");
+            
+            // verifica se o depósit é parte de uma transferência
+            if (!transf)
+            {
+                // caso não for, notifica o sucesso
+                Cores.Sucesso($"Depósito de R${_valor} realizado com sucesso!");
+            }
         }
         else
         {
