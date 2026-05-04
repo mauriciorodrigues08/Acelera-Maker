@@ -4,60 +4,62 @@ namespace Projeto_Conta_Bancaria.Classes;
 using System;
 public class Menu
 {
-    // atributos
-    private int op;
     private ContaController controller = new ContaController();
 
-    // Inicia um Menu
+    // inicia um Menu
     public void Iniciar()
     {
+        // variável auxiliar para opção
+        int op;
+
+        // loop principal
         do
         {
             Console.Clear();
-            // Exibe o menu e recebe a opção
+            // exibe o menu e recebe a opção
             printMenu();
             op = Convert.ToInt32(Console.ReadLine());
 
-            // Realiza a ação selecionada
+            // realiza a ação selecionada
             switch (op)
             {
-                // Sair
+                // sair
                 case 0:
                     Cores.Separador();
                     Cores.Info("\nPrograma finalizado...");
                     break;
 
-                // Cadastrar
+                // cadastrar
                 case 1:
                     cadastrar(controller);
                     break;
 
-                // Listar
+                // listar
                 case 2:
                     listar(controller);
                     break;
 
-                // Atualizar
+                // atualizar
                 case 3:
                     atualizar(controller);
                     break;
 
-                // Deletar
+                // deletar
                 case 4:
                     deletar(controller);
                     break;
 
-                // Saque
+                // saque
                 case 5:
                     sacar(controller);
                     break;
 
-                // Depósito
+                // depósito
                 case 6:
                     depositar(controller);
                     break;
 
-                // Transferência
+                // transferência
                 case 7:
                     transferir(controller);
                     break;
@@ -70,7 +72,7 @@ public class Menu
         } while(op != 0);
     }
 
-    // Exibe o menu e recebe a opção desejada
+    // exibe o menu e recebe a opção desejada
     private void printMenu()
     {
         Cores.Cabecalho("MENU INICIAL");
@@ -88,13 +90,13 @@ public class Menu
 
     private void cadastrar(ContaController controller) 
     {
-        // Declara a Nova Conta
+        // declara a Nova Conta
         Conta novaConta;
 
         Console.Clear();
         Cores.Cabecalho("CADASTRANDO NOVA CONTA");
 
-        // Recebe o nome do Titular
+        // recebe o nome do Titular
         Cores.Write("Insira o nome do Titular: ");
         string? titular = Console.ReadLine();
         if(titular == null)
@@ -103,35 +105,40 @@ public class Menu
             return;
         }
 
-        // Gera o Número
+        // gera o Número
         int numero = controller.gerarNumero();
 
-        // Gera a Agência
-        int agencia = 0;
+        // gera a Agência
+        int agencia = numero * 11;
         
-        // Inicia o saldo com 0
+        // inicia o saldo com 0
         float saldo = 0f;
 
-        // Recebe o Tipo
+        // recebe o Tipo
         Cores.Write("Informe o Tipo da Nova Conta (1. Corrente ou 2. Poupança): ");
         int tipo = Convert.ToInt32(Console.ReadLine());
 
-        // Verifica o tipo fornceido
+        // verifica o tipo fornceido
         if(tipo == 1)
         {
-            // Cria os atributos de Conta Corrente
-            float limite = 100f;
+            // cria os atributos de Conta Corrente
+            Cores.Write("Informe o limite desejado: ");
+            float limite;
+            while (!float.TryParse(Console.ReadLine(), out limite))
+            {   
+                Cores.Erro("Valor inválido! Digite novamente: ");
+            }
 
-            // Instancia a Nova Conta
+            // instancia a Nova Conta
             novaConta = new ContaCorrente(numero, agencia, tipo, titular, saldo, limite);
         }
         else if (tipo == 2)
         {
-            // Cria os atributos de Conta Poupança
+            // cria os atributos de Conta Poupança
             Cores.Write("Informe o seu ano de Nascimento: ");
             int aniversario = Convert.ToInt32(Console.ReadLine());
 
-            // Instancia a Nova Conta
+            // instancia a Nova Conta
             novaConta = new ContaPoupanca(numero, agencia, tipo, titular, saldo, aniversario);
         }
         else
@@ -140,10 +147,10 @@ public class Menu
             return;
         }
         
-        // Adiciona a Nova Conta à lista de Contas Cadastradas
+        // adiciona a Nova Conta à lista de Contas Cadastradas
         controller.cadastrar(novaConta);
 
-        // Imprime os dados da conta criada
+        // imprime os dados da conta criada
         novaConta.visualizar();
 
         Cores.Separador();

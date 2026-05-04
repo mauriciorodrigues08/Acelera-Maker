@@ -100,13 +100,13 @@ public class ContaController : IContaRepository
         string? confirmacao = Console.ReadLine();
 
         // se confirmar, exclui
-        if (confirmacao == "S")
+        if (confirmacao?.ToUpper() == "S")
         {
             contasCadastradas.RemoveAt(contasCadastradas.IndexOf(contaExistente));
             Cores.Sucesso($"Conta de número {_numero} deletada com sucesso!\n");
         }
         // caso não confirmar, ou digitar chave inválida, cancela
-        else if (confirmacao == "N")
+        else if (confirmacao?.ToUpper() == "N")
         {
             Cores.Erro("Operação Cancelada!");
         }

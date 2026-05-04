@@ -53,8 +53,8 @@ public class ContaPoupanca : Conta
             {   
                 // se não for, retorna mensagem de sucesso
                 Cores.Sucesso($"Saque de R${_valor} realizado com sucesso!\n");
-                return true;
             }
+            return true;
         }
 
         // retorna mensagem de erro
