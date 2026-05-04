@@ -2,24 +2,53 @@ namespace Projeto_Conta_Bancaria.Classes;
 
 // imports
 using System.Collections.Generic;
+using System.Text.Json;
 
 public class ContaController : IContaRepository
 {
+    // caminho do arquivo json para Persistência de Dados
+    private static readonly string CAMINHO_ARQUIVO = Path.Combine(
+        AppContext.BaseDirectory, // caminho atual (Projeto\bin\Debug\net10.0)
+        "../../../contas.json" // volta 3 diretórios e acessa o arquivo na pasta base (Projeto)
+    );
+
+    // configurações para o json
+    private static readonly JsonSerializerOptions JSON_OPTIONS = new()
+    {
+        WriteIndented = true, // adiciona quebras de linha ao arquivo
+        PropertyNameCaseInsensitive = true // ignora maiúsculas e minúsculas (case insensitive)
+    };
+
     // lista para armazenar todas as Contas
     private List<Conta> contasCadastradas = new();
+
+    // CONSTRUTOR
+    public ContaController()
+    {
+        carregar();
+    }
 
     // CADASTRAR NOVA CONTA
     public void cadastrar (Conta _conta)
     {
+        // adiciona a nova conta à coleção
         contasCadastradas.Add(_conta);
-        
+
+        //notifica sucesso
         Cores.Sucesso($"Conta de número {_conta.getNumero()} cadastrada com sucesso!\n");
+        
+        // salva no json
+        salvar();
     }
 
     // GERA UM NÚMERO AUTOMÁTICO PARA A CONTA
     public int gerarNumero()
     {
-        return contasCadastradas.Count + 1;
+        // retorna 1 se a coleção estiver vazia
+        if (contasCadastradas.Count == 0) return 1;
+        
+        // retorna o número da última conta cadastrada somado de 1 
+        return contasCadastradas[(contasCadastradas.Count - 1)].getNumero() + 1;
     }
 
     // ATUALIZAR UMA CONTA
@@ -42,6 +71,9 @@ public class ContaController : IContaRepository
             // notifica o erro
             Cores.Erro($"Erro! Conta de número {_conta.getNumero()} não está cadastrada.\n");
         }
+
+        // salva no json
+        salvar();
     }
 
     // PROCURAR POR NÚMERO
@@ -102,8 +134,12 @@ public class ContaController : IContaRepository
         // se confirmar, exclui
         if (confirmacao?.ToUpper() == "S")
         {
+            // deleta e notifica sucesso
             contasCadastradas.RemoveAt(contasCadastradas.IndexOf(contaExistente));
             Cores.Sucesso($"Conta de número {_numero} deletada com sucesso!\n");
+            
+            // salva no json
+            salvar();
         }
         // caso não confirmar, ou digitar chave inválida, cancela
         else if (confirmacao?.ToUpper() == "N")
@@ -114,7 +150,6 @@ public class ContaController : IContaRepository
         {
             Cores.Erro("Chave inválida! Operação Cancelada!");
         }
-
     }
 
     // CHAMA O MÉTODO SACAR
@@ -132,7 +167,10 @@ public class ContaController : IContaRepository
         }
 
         // caso exista, chama o método sacar
-        contaExistente.sacar(_valor);
+        bool saqueRealizado = contaExistente.sacar(_valor);
+
+        // salva no json caso o saque tenha sucesso
+        if (saqueRealizado) salvar();
     }
 
     // CHAMA O MÉTODO DEPOSITAR
@@ -151,6 +189,9 @@ public class ContaController : IContaRepository
 
         // caso exista, chama o método depositar
         contaExistente.depositar(_valor);
+
+        // salva no json
+        salvar();
     }
 
     // CHAMA O MÉTODO DE TRANSFERÊNCIA
@@ -178,6 +219,9 @@ public class ContaController : IContaRepository
         // caso o saque seja feito, credita na conta de destino
         contaDestino.depositar(_valor, true);
         Cores.Sucesso($"Transferência de R${_valor} concluída com sucesso!");
+
+        // salva no json
+        salvar();
     }
 
     // BUSCA UMA CONTA NA BASE DE DADOS
@@ -192,6 +236,55 @@ public class ContaController : IContaRepository
         }
 
         return null;
+    }
+
+    // PERSISTÊNCIA DE DADOS
+    // Carregar
+    public void carregar()
+    {
+        // verifica se o arquivo existe
+        if (!File.Exists(CAMINHO_ARQUIVO)) return;
+
+        // tenta carregar os dados
+        try
+        {
+            // lê o json em uma string
+            string json = File.ReadAllText(CAMINHO_ARQUIVO);
+
+            // desserializa a string dentro de uma coleção
+            var colecao = JsonSerializer.Deserialize<List<Conta>>(json, JSON_OPTIONS);
+
+            // verifica se a coleção gerada é válida
+            if (colecao != null)
+            {
+                // carrega os dados na coleção contasCadastradas
+                contasCadastradas = colecao;
+
+                // notifica sucesso
+                Cores.Sucesso("Carregamento json concluído com sucesso!");
+            }
+        }
+        // trata exceção (falha na coleta dos dados)
+        catch (Exception ex)
+        {
+            Cores.Erro($"Erro ao carregar os dados: {ex.Message}");
+        }
+    }
+
+    // Salvar
+    public void salvar()
+    {
+        try
+        {    
+            // salva as informações no arquivo
+            var json = JsonSerializer.Serialize(contasCadastradas, JSON_OPTIONS);
+            File.WriteAllText(CAMINHO_ARQUIVO, json);
+        }
+        catch (Exception ex)
+        {
+            // notifica erro
+            Cores.Erro($"Erro ao salvar: {ex.Message}");
+        }
     }
 
 }

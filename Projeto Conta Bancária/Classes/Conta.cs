@@ -1,13 +1,20 @@
 namespace Projeto_Conta_Bancaria.Classes;
 
+// import
+using System.Text.Json.Serialization;
+
+// Atributos json para a classe Conta
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "tipoConta")]
+[JsonDerivedType(typeof(ContaCorrente), "corrente")]
+[JsonDerivedType(typeof(ContaPoupanca), "poupanca")]
 public abstract class Conta
 {
-    //atributos
-    private int numero;
-    private int agencia;
-    private int tipo;
-    private string titular;
-    private float saldo;
+    //atributos (liberados para acesso do json)
+    [JsonInclude] private string titular;
+    [JsonInclude] private int tipo;
+    [JsonInclude] private int numero;
+    [JsonInclude] private int agencia;
+    [JsonInclude] private float saldo;
 
     // construtor
     public Conta(int _numero = 0, int _agencia = 0, int _tipo = 0, string _titular = "", float _saldo = 0)

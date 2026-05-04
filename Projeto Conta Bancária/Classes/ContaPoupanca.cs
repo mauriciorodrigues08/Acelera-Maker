@@ -2,11 +2,12 @@ namespace Projeto_Conta_Bancaria.Classes;
 
 //imports
 using System;
+using System.Text.Json.Serialization;
 
 public class ContaPoupanca : Conta
 {
     // atributos
-    private int aniversario;
+    [JsonInclude] private int aniversario;
     
     // construtor
     public ContaPoupanca(int _numero, int _agencia, int _tipo, string _titular, float _saldo, int _aniversario)

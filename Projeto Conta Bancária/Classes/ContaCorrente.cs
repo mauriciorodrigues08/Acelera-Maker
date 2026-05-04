@@ -2,11 +2,12 @@ namespace Projeto_Conta_Bancaria.Classes;
 
 // imports
 using System;
+using System.Text.Json.Serialization;
 
 public class ContaCorrente : Conta
 {
     // atributos
-    private float limite;
+    [JsonInclude] private float limite;
     
     // construtor
     public ContaCorrente(int _numero, int _agencia, int _tipo, string _titular, float _saldo, float _limite)
