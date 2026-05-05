@@ -73,7 +73,7 @@ public class ContaCorrente : Conta
         return false;
     }
 
-    // vizualizar
+    // visualizar
     public override void visualizar(){
         Cores.Titulo("- EXIBINDO DADOS DO CLIENTE -");
         Cores.Info($"Titular: {this.getTitular()}");

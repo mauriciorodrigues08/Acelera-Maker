@@ -15,9 +15,9 @@ public class ContaController : IContaRepository
     // configurações para o json
     internal static readonly JsonSerializerOptions JSON_OPTIONS = new()
     {
-        WriteIndented = true, // adiciona quebras de linha ao arquivo
+        WriteIndented = true,               // adiciona quebras de linha ao arquivo json
         PropertyNameCaseInsensitive = true, // ignora maiúsculas e minúsculas (case insensitive)
-        IncludeFields = true //
+        IncludeFields = true                // necessário para serializar campos internal com [JsonInclude]
     };
 
     // lista para armazenar todas as Contas
@@ -33,7 +33,7 @@ public class ContaController : IContaRepository
         contasCadastradas.Add(_conta);
 
         //notifica sucesso
-        Cores.Sucesso($"Conta de número {_conta.getNumero()} cadastrada com sucesso!\n");
+        Cores.Sucesso($"\nConta de número {_conta.getNumero()} cadastrada com sucesso!\n");
         
         // salva no json
         salvar();
@@ -54,7 +54,10 @@ public class ContaController : IContaRepository
     public void atualizar(int _numero, string _titular, float _limite)
     {
         Conta? contaExistente = buscarNaCollection(_numero);
-        if (contaExistente == null) { Cores.Erro("Conta não encontrada!"); return; }
+        if (contaExistente == null) {
+            Cores.Erro("\nConta não encontrada!");
+            return;
+        }
 
         var contaAtt = new ContaCorrente(
             contaExistente.getNumero(),
@@ -64,16 +67,23 @@ public class ContaController : IContaRepository
             _limite
         );
 
+        // atualiza a conta na coleção
         contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = contaAtt;
-        Cores.Sucesso($"Conta {_numero} atualizada com sucesso!");
-        salvar();
+        Cores.Sucesso($"\nConta de número {_numero} atualizada com sucesso!");
+
+        // mostra a conta com os novos dados e salva
+        contaAtt.visualizar();
+        salvar();    
     }
 
     // sobrecarga para Conta Poupança
     public void atualizar(int _numero, string _titular, int _aniversario)
     {
         Conta? contaExistente = buscarNaCollection(_numero);
-        if (contaExistente == null) { Cores.Erro("Conta não encontrada!"); return; }
+        if (contaExistente == null) {
+            Cores.Erro("\nConta não encontrada!");
+            return;
+        }
 
         var contaAtt = new ContaPoupanca(
             contaExistente.getNumero(),
@@ -83,8 +93,12 @@ public class ContaController : IContaRepository
             _aniversario
         );
 
+        // atualiza a conta na coleção
         contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = contaAtt;
-        Cores.Sucesso($"Conta {_numero} atualizada com sucesso!");
+        Cores.Sucesso($"\nConta de número {_numero} atualizada com sucesso!");
+        
+        // mostra a conta com os novos dados e salva
+        contaAtt.visualizar();
         salvar();
     }
 
@@ -102,7 +116,7 @@ public class ContaController : IContaRepository
         else
         {
             // notifica o erro
-            Cores.Erro($"Conta de número {_numero} não encontrada!\n");
+            Cores.Erro($"\nConta de número {_numero} não encontrada!\n");
         }
     }
 
@@ -133,7 +147,7 @@ public class ContaController : IContaRepository
         // caso não exista, notifica
         if (contaExistente == null)
         {
-            Cores.Erro($"Conta de número {_numero} não está cadastrada!\n");
+            Cores.Erro($"\nConta de número {_numero} não está cadastrada!\n");
 
             return;
         }
@@ -148,7 +162,7 @@ public class ContaController : IContaRepository
         {
             // deleta e notifica sucesso
             contasCadastradas.RemoveAt(contasCadastradas.IndexOf(contaExistente));
-            Cores.Sucesso($"Conta de número {_numero} deletada com sucesso!\n");
+            Cores.Sucesso($"\nConta de número {_numero} deletada com sucesso!\n");
             
             // salva no json
             salvar();
@@ -156,11 +170,11 @@ public class ContaController : IContaRepository
         // caso não confirmar, ou digitar chave inválida, cancela
         else if (confirmacao?.ToUpper() == "N")
         {
-            Cores.Erro("Operação Cancelada!");
+            Cores.Erro("\nOperação Cancelada!");
         }
         else
         {
-            Cores.Erro("Chave inválida! Operação Cancelada!");
+            Cores.Erro("\nChave inválida! Operação Cancelada!");
         }
     }
 
@@ -173,7 +187,7 @@ public class ContaController : IContaRepository
         // caso não exista
         if (contaExistente == null)
         {
-            Cores.Erro($"Conta de número {_numero} não está cadastrada!\n");
+            Cores.Erro($"\nConta de número {_numero} não está cadastrada!\n");
 
             return;
         }
@@ -194,7 +208,7 @@ public class ContaController : IContaRepository
         // caso não exista
         if (contaExistente == null)
         {
-            Cores.Erro($"Conta de número {_numero} não está cadastrada!\n");
+            Cores.Erro($"\nConta de número {_numero} não está cadastrada!\n");
 
             return;
         }
@@ -213,27 +227,44 @@ public class ContaController : IContaRepository
         Conta? contaOrigem = buscarNaCollection(_numeroOrigem);
         if (contaOrigem == null)
         {
-            Cores.Erro($"Conta de número {_numeroOrigem} não está cadastrada!\n");
+            Cores.Erro($"\nConta de número {_numeroOrigem} não está cadastrada!\n");
             return;
         }
 
         Conta? contaDestino = buscarNaCollection(_numeroDestino);
         if (contaDestino == null)
         {
-            Cores.Erro($"Conta de número {_numeroDestino} não está cadastrada!\n");
+            Cores.Erro($"\nConta de número {_numeroDestino} não está cadastrada!\n");
             return;
         }
 
-        // verifica se a Conta de Origem possui o valor desejado
-        bool saqueRealizado = contaOrigem.sacar(_valor, true);
-        if (!saqueRealizado) return;
+        // verificação de transação
+        Cores.Info($"\nTransferindo R${_valor} de {contaOrigem.getTitular()} para {contaDestino.getTitular()}...");
+        Cores.Write("Continuar? (S/N): ");
+        string? confirmacao = Console.ReadLine();
 
-        // caso o saque seja feito, credita na conta de destino
-        contaDestino.depositar(_valor, true);
-        Cores.Sucesso($"Transferência de R${_valor} concluída com sucesso!");
+        if (confirmacao?.ToUpper() == "S")
+        {
+            // verifica se a Conta de Origem possui o valor desejado
+            bool saqueRealizado = contaOrigem.sacar(_valor, true);
+            if (!saqueRealizado) return;
 
-        // salva no json
-        salvar();
+            // caso o saque seja feito, credita na conta de destino
+            contaDestino.depositar(_valor, true);
+            Cores.Sucesso($"\nTransferência de R${_valor} concluída com sucesso!");
+
+            // salva no json
+            salvar();
+        }
+        else if (confirmacao?.ToUpper() == "N")
+        {
+            Cores.Erro("\nOperação Cancelada!");
+        }
+        else
+        {
+            Cores.Erro("\nChave inválida! Operação Cancelada!");
+        }
+
     }
 
     // BUSCA UMA CONTA NA BASE DE DADOS
@@ -292,7 +323,7 @@ public class ContaController : IContaRepository
         catch (Exception ex)
         {
             // notifica erro
-            Cores.Erro($"Erro ao salvar: {ex.Message}");
+            Cores.Erro($"Erro ao salvar dados: {ex.Message}");
         }
     }
 

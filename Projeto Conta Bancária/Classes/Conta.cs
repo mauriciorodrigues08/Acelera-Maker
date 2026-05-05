@@ -18,7 +18,7 @@ public abstract class Conta
 
     // construtores
     [JsonConstructor]
-    public Conta()
+    protected Conta()
     {
         this.titular = "";
     }

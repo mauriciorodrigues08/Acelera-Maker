@@ -25,7 +25,11 @@ public class Menu
             Console.Clear();
             // exibe o menu e recebe a opção
             printMenu();
-            op = Convert.ToInt32(Console.ReadLine());
+            while(!int.TryParse(Console.ReadLine(), out op) || op < 0 || op > 7)
+            {
+                Cores.Erro("Opção inválida!");
+                Cores.Write("Digite novamente: ");
+            }
 
             // realiza a ação selecionada
             switch (op)
@@ -70,10 +74,6 @@ public class Menu
                 case 7:
                     transferir(controller);
                     break;
-
-                default:
-                    Cores.Aviso("Opção Inválida!");
-                    break;
             }
 
         } while(op != 0);
@@ -106,10 +106,13 @@ public class Menu
         // recebe o nome do Titular
         Cores.Write("Insira o nome do Titular: ");
         string? titular = Console.ReadLine();
-        if(titular == null)
+        
+        // verifica se a string é nula ou apenas espaços
+        while (string.IsNullOrWhiteSpace(titular)) 
         {
             Cores.Erro("Nome inválido!");
-            return;
+            Cores.Write("Insira o nome do Titular: ");
+            titular = Console.ReadLine();
         }
 
         // gera o Número
@@ -123,10 +126,15 @@ public class Menu
 
         // recebe o Tipo
         Cores.Write("Informe o Tipo da Nova Conta (1. Corrente ou 2. Poupança): ");
-        int tipo = Convert.ToInt32(Console.ReadLine());
+        int tipo;
+        while (!int.TryParse(Console.ReadLine(), out tipo) || (tipo != 1 && tipo != 2))
+        {
+            Cores.Erro("Tipo inválido!");
+            Cores.Write("Digite novamente: ");
+        }
 
         // verifica o tipo fornceido
-        if(tipo == 1)
+        if(tipo == 1) // corrente
         {
             // cria os atributos de Conta Corrente
             Cores.Write("Informe o limite desejado: ");
@@ -139,19 +147,20 @@ public class Menu
             // instancia a Nova Conta
             novaConta = new ContaCorrente(numero, agencia, tipo, titular, saldo, limite);
         }
-        else if (tipo == 2)
+        else // poupança
         {
             // cria os atributos de Conta Poupança
             Cores.Write("Informe o seu ano de Nascimento: ");
-            int aniversario = Convert.ToInt32(Console.ReadLine());
+            int aniversario;
+            while(!int.TryParse(Console.ReadLine(), out aniversario) || aniversario < 1900)
+            {
+                Cores.Erro("Número inválido!");
+                Cores.Write("Digite novamente: ");        
+            }
+
 
             // instancia a Nova Conta
             novaConta = new ContaPoupanca(numero, agencia, tipo, titular, saldo, aniversario);
-        }
-        else
-        {
-            Cores.Erro("Tipo de conta inválido!");
-            return;
         }
         
         // adiciona a Nova Conta à lista de Contas Cadastradas
@@ -184,13 +193,18 @@ public class Menu
 
     // recebe o número
     Cores.Write("Informe o número da conta: ");
-    int numero = Convert.ToInt32(Console.ReadLine());
+    int numero;
+    while(!int.TryParse(Console.ReadLine(), out numero))
+    {
+        Cores.Erro("Número inválido!");
+        Cores.Write("Digite novamente: ");        
+    }
 
     // busca a conta para saber o tipo e exibir os dados atuais
     Conta? conta = controller.buscarNaCollection(numero);
     if (conta == null)
     {
-        Cores.Erro("Conta não encontrada!");
+        Cores.Erro("\nConta não encontrada!");
         return;
     }
 
@@ -200,7 +214,14 @@ public class Menu
     // coleta o novo titular
     Cores.Write("Novo titular: ");
     string? titular = Console.ReadLine();
-    if (titular == null) { Cores.Erro("Titular inválido!"); return; }
+    
+    // verifica se a string é nula ou apenas espaços
+    while (string.IsNullOrWhiteSpace(titular)) 
+    {
+        Cores.Erro("Nome inválido!");
+        Cores.Write("Insira o nome do Titular: ");
+        titular = Console.ReadLine();
+    }
 
     // coleta dados específicos por tipo
     if (conta.getTipo() == 1)
@@ -223,6 +244,10 @@ public class Menu
         // passa tudo pronto para o controller
         controller.atualizar(numero, titular, aniversario);
     }
+
+    Cores.Separador();
+    Cores.Write("\nPressione enter para voltar ao menu...");
+    Console.ReadLine();
 }
 
     private void deletar(ContaController controller) 
@@ -232,7 +257,12 @@ public class Menu
 
         // recebe numero da conta que será deletada
         Cores.Write("Informe o número da conta: ");
-        int numero = Convert.ToInt32(Console.ReadLine());
+        int numero;
+        while(!int.TryParse(Console.ReadLine(), out numero))
+    {
+        Cores.Erro("Número inválido!");
+        Cores.Write("Digite novamente: ");        
+    }
 
         // passa para o controller
         controller.deletar(numero);
@@ -249,8 +279,13 @@ public class Menu
 
         // recebe o número da conta
         Cores.Write("Informe o número da conta: ");
-        int numero = Convert.ToInt32(Console.ReadLine());
-
+        int numero;
+        while(!int.TryParse(Console.ReadLine(), out numero))
+        {
+            Cores.Erro("Número inválido!");
+            Cores.Write("Digite novamente: ");        
+        }
+        
         // recebe o valor do saque
         Cores.Write("Informe o valor do saque: ");
         float valor;
@@ -274,7 +309,12 @@ public class Menu
 
         // recebe o número da conta
         Cores.Write("Informe o número da conta: ");
-        int numero = Convert.ToInt32(Console.ReadLine());
+        int numero;
+        while(!int.TryParse(Console.ReadLine(), out numero))
+        {
+            Cores.Erro("Número inválido!");
+            Cores.Write("Digite novamente: ");        
+        }
 
         // recebe o valor do depósito
         Cores.Write("Informe o valor do depósito: ");
@@ -299,11 +339,23 @@ public class Menu
 
         // recebe a conta de origem
         Cores.Write("Informe o número da conta de Origem: ");
-        int numeroOrigem = Convert.ToInt32(Console.ReadLine());
+        int numeroOrigem;
+        while(!int.TryParse(Console.ReadLine(), out numeroOrigem))
+        {
+            Cores.Erro("Número inválido!");
+            Cores.Write("Digite novamente: ");        
+        }
+
 
         // recebe a conta de destino
         Cores.Write("Informe o número da conta de Destino: ");
-        int numeroDestino = Convert.ToInt32(Console.ReadLine());
+        int numeroDestino;
+        while(!int.TryParse(Console.ReadLine(), out numeroDestino))
+        {
+            Cores.Erro("Número inválido!");
+            Cores.Write("Digite novamente: ");        
+        }
+
         
         // recebe o valor da transação
         Cores.Write("Informe o valor da transação: ");

@@ -31,7 +31,7 @@ public class ContaPoupanca : Conta
         this.aniversario = _aniversario;
     }
     
-    // vizualizar
+    // visualizar
     public override void visualizar()
     {
         Cores.Titulo("- EXIBINDO DADOS DO CLIENTE -");

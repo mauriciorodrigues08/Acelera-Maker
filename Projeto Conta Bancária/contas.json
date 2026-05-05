@@ -1,12 +1,12 @@
 [
   {
     "tipoConta": "corrente",
-    "limite": 2000,
+    "limite": 8000,
     "titular": "mauricio",
     "tipo": 1,
     "numero": 1,
     "agencia": 11,
-    "saldo": 500
+    "saldo": 150
   },
   {
     "tipoConta": "poupanca",
@@ -15,6 +15,15 @@
     "tipo": 2,
     "numero": 2,
     "agencia": 22,
+    "saldo": 2000
+  },
+  {
+    "tipoConta": "corrente",
+    "limite": 3000,
+    "titular": "joao",
+    "tipo": 1,
+    "numero": 3,
+    "agencia": 33,
     "saldo": 0
   }
 ]
