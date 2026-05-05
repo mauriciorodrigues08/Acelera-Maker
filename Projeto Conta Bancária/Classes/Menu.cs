@@ -7,8 +7,14 @@ public class Menu
     // inicia um Menu
     public void Iniciar()
     {
+        Console.Clear();
+        
         // variável de controle
         ContaController controller = new ContaController();
+        
+        // carrega o arquivo json
+        controller.carregar();
+
 
         // variável auxiliar para opção
         int op;
@@ -171,22 +177,53 @@ public class Menu
         Console.ReadLine();
     }
 
-    private void atualizar(ContaController controller) 
+    private void atualizar(ContaController controller)
+{
+    Console.Clear();
+    Cores.Cabecalho("- ATUALIZANDO CONTA -");
+
+    // recebe o número
+    Cores.Write("Informe o número da conta: ");
+    int numero = Convert.ToInt32(Console.ReadLine());
+
+    // busca a conta para saber o tipo e exibir os dados atuais
+    Conta? conta = controller.buscarNaCollection(numero);
+    if (conta == null)
     {
-        Console.Clear();
-        Cores.Cabecalho("- ATUALIZANDO CONTA -");
-
-        // recebe o número da conta que será atualizada
-        Cores.Write("Informe o número da conta: ");
-        int numero = Convert.ToInt32(Console.ReadLine());
-
-        // envia para o controller
-        controller.atualizar(numero);
-    
-        Cores.Separador();
-        Cores.Write("\nPressione enter para voltar ao menu...");
-        Console.ReadLine();
+        Cores.Erro("Conta não encontrada!");
+        return;
     }
+
+    // exibe os dados atuais
+    conta.visualizar();
+
+    // coleta o novo titular
+    Cores.Write("Novo titular: ");
+    string? titular = Console.ReadLine();
+    if (titular == null) { Cores.Erro("Titular inválido!"); return; }
+
+    // coleta dados específicos por tipo
+    if (conta.getTipo() == 1)
+    {
+        Cores.Write("Novo limite: ");
+        float limite;
+        while (!float.TryParse(Console.ReadLine(), out limite))
+            Cores.Erro("Valor inválido! Digite novamente: ");
+
+        // passa tudo pronto para o controller
+        controller.atualizar(numero, titular, limite);
+    }
+    else
+    {
+        Cores.Write("Novo aniversário: ");
+        int aniversario;
+        while (!int.TryParse(Console.ReadLine(), out aniversario) || aniversario < 1900)
+            Cores.Erro("Valor inválido! Digite novamente: ");
+
+        // passa tudo pronto para o controller
+        controller.atualizar(numero, titular, aniversario);
+    }
+}
 
     private void deletar(ContaController controller) 
     {

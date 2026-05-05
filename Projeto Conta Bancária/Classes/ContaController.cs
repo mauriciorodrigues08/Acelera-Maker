@@ -16,17 +16,15 @@ public class ContaController : IContaRepository
     internal static readonly JsonSerializerOptions JSON_OPTIONS = new()
     {
         WriteIndented = true, // adiciona quebras de linha ao arquivo
-        PropertyNameCaseInsensitive = true // ignora maiúsculas e minúsculas (case insensitive)
+        PropertyNameCaseInsensitive = true, // ignora maiúsculas e minúsculas (case insensitive)
+        IncludeFields = true //
     };
 
     // lista para armazenar todas as Contas
     internal List<Conta> contasCadastradas = new();
 
     // CONSTRUTOR
-    public ContaController()
-    {
-        carregar();
-    }
+    public ContaController() { }
 
     // CADASTRAR NOVA CONTA
     public void cadastrar (Conta _conta)
@@ -52,84 +50,41 @@ public class ContaController : IContaRepository
     }
 
     // ATUALIZAR UMA CONTA
-    public void atualizar (int _numero)
+    // sobrecarga para Conta Corrente
+    public void atualizar(int _numero, string _titular, float _limite)
     {
-        // verifica se a conta está cadastrada
         Conta? contaExistente = buscarNaCollection(_numero);
+        if (contaExistente == null) { Cores.Erro("Conta não encontrada!"); return; }
 
-        // caso exista, atualiza seus valores
-        if (contaExistente != null)
-        {
-            // cria a conta com as informações atualizadas
-            Conta contaAtt;
+        var contaAtt = new ContaCorrente(
+            contaExistente.getNumero(),
+            contaExistente.getAgencia(),
+            1, _titular,
+            contaExistente.getSaldo(),
+            _limite
+        );
 
-            // recebe o novo titular
-            Cores.Write("Informe o novo titular: ");
-            string? titularAtt = null;
-            while(titularAtt == null)
-            {
-                titularAtt = Console.ReadLine();
-            }
+        contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = contaAtt;
+        Cores.Sucesso($"Conta {_numero} atualizada com sucesso!");
+        salvar();
+    }
 
-            // verifica se é conta corrente (tipo = 1)
-            if (contaExistente.getTipo() == 1)
-            {
-                // recebe o novo limite
-                float limiteAtt;
-                Cores.Write("Informe o novo limite: ");
-                while (!float.TryParse(Console.ReadLine(), out limiteAtt))
-                {   
-                    Cores.Erro("Valor inválido!");
-                    Cores.Write("Digite novamente: ");
-                }
+    // sobrecarga para Conta Poupança
+    public void atualizar(int _numero, string _titular, int _aniversario)
+    {
+        Conta? contaExistente = buscarNaCollection(_numero);
+        if (contaExistente == null) { Cores.Erro("Conta não encontrada!"); return; }
 
-                contaAtt = new ContaCorrente
-                (
-                    contaExistente.getNumero(),  // numero
-                    contaExistente.getAgencia(), // agencia
-                    1,                           // tipo
-                    titularAtt,                  // novo titular
-                    contaExistente.getSaldo(),   // saldo
-                    limiteAtt                    // novo limite
-                );
-            }
-            // verifica se é conta poupança (tipo = 2)
-            else
-            {
-                // novo aniversário
-                Cores.Write("Informe o novo aniversário: ");
-                int aniversarioAtt = Convert.ToInt32(Console.ReadLine());
-                while (aniversarioAtt < 1900)
-                {
-                    Cores.Erro("Valor inválido!");
-                    Cores.Write("Digite novamente: ");
-                }
+        var contaAtt = new ContaPoupanca(
+            contaExistente.getNumero(),
+            contaExistente.getAgencia(),
+            2, _titular,
+            contaExistente.getSaldo(),
+            _aniversario
+        );
 
-                // instancia a nova conta atualizada
-                contaAtt = new ContaPoupanca
-                (
-                    contaExistente.getNumero(),  // numero
-                    contaExistente.getAgencia(), // agencia
-                    2,                           // tipo
-                    titularAtt,                  // novo titular
-                    contaExistente.getSaldo(),   // saldo
-                    aniversarioAtt               // novo aniversário
-                );
-            }
-
-            // atualiza o índice da conta na coleção
-            contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = contaAtt;
-
-            // notifica sucesso
-            Cores.Sucesso($"Conta de número {_numero} atualizada com sucesso!\n");
-        }
-        else
-        {
-            // notifica o erro
-            Cores.Erro($"Erro! Conta de número {_numero} não está cadastrada.\n");
-        }
-
-        // salva no json
+        contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = contaAtt;
+        Cores.Sucesso($"Conta {_numero} atualizada com sucesso!");
         salvar();
     }
 

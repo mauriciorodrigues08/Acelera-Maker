@@ -17,7 +17,7 @@ public abstract class Conta
     [JsonInclude] internal float saldo;
 
     // construtores
-
+    [JsonConstructor]
     public Conta()
     {
         this.titular = "";

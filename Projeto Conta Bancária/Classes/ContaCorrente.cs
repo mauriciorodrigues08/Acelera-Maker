@@ -10,8 +10,8 @@ public class ContaCorrente : Conta
     [JsonInclude] internal float limite;
     
     // construtores
-
-    public ContaCorrente() : base() { }
+    [JsonConstructor]
+    protected ContaCorrente() : base() { }
     public ContaCorrente(int _numero, int _agencia, int _tipo, string _titular, float _saldo, float _limite)
         : base(_numero, _agencia, _tipo, _titular, _saldo)
     {

@@ -5,7 +5,8 @@ public interface IContaRepository
     public void procurarPorNumero(int _numero);
     public void listarTodas();
     public void cadastrar (Conta _conta);
-    public void atualizar (int _numero);
+    public void atualizar (int _numero, string _titular, float _limite);
+    public void atualizar (int _numero, string _titular, int _aniversario);
     public void deletar (int _numero);
     public void sacar(int _numero, float _valor);
     public void depositar(int _numero, float _valor);
