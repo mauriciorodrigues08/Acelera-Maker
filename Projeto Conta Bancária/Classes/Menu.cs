@@ -9,13 +9,17 @@ public class Menu
     {
         Console.Clear();
         
-        // variável de controle
+        // instancia a variável de controle
         ContaController controller = new ContaController();
         
-        // carrega o arquivo json
-        controller.carregar();
-
-
+        // tenta carregar o arquivo json
+        if (controller.carregar())
+        {
+            // caso o arquivo exita, mostra a mensagem de retorno da função
+            Cores.Write("\nPressione enter para continuar...");
+            Console.ReadLine();
+        }
+        
         // variável auxiliar para opção
         int op;
 

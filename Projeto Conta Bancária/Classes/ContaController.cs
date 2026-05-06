@@ -283,10 +283,14 @@ public class ContaController : IContaRepository
 
     // PERSISTÊNCIA DE DADOS
     // Carregar
-    public void carregar()
+    public bool carregar()
     {
+        // retorno:
+        // true  -> arquivo existe
+        // false -> arquivo não existe
+
         // verifica se o arquivo existe
-        if (!File.Exists(CAMINHO_ARQUIVO)) return;
+        if (!File.Exists(CAMINHO_ARQUIVO)) return false;
 
         // tenta carregar os dados
         try
@@ -309,10 +313,14 @@ public class ContaController : IContaRepository
         {
             Cores.Erro($"Erro ao carregar os dados: {ex.Message}");
         }
+
+        // caso não tenha exeções, notifica sucesso e retorna true
+        Cores.Sucesso("Dados carregados com sucesso!");
+        return true;
     }
 
     // Salvar
-    public void salvar()
+    public bool salvar()
     {
         try
         {    
@@ -324,7 +332,11 @@ public class ContaController : IContaRepository
         {
             // notifica erro
             Cores.Erro($"Erro ao salvar dados: {ex.Message}");
+            return false;
         }
+
+        // caso não tenha exeções, retorna true
+        return true;
     }
 
 }

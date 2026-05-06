@@ -19,7 +19,7 @@
   },
   {
     "tipoConta": "corrente",
-    "limite": 3000,
+    "limite": 2000,
     "titular": "joao",
     "tipo": 1,
     "numero": 3,
