@@ -66,16 +66,21 @@ public class Menu
 
                 // saque
                 case 5:
+                    buscar(controller);
+                    break;
+
+                // saque
+                case 6:
                     sacar(controller);
                     break;
 
                 // depósito
-                case 6:
+                case 7:
                     depositar(controller);
                     break;
 
                 // transferência
-                case 7:
+                case 8:
                     transferir(controller);
                     break;
             }
@@ -91,9 +96,10 @@ public class Menu
         Cores.Info("2. LISTAR TODAS AS CONTAS");
         Cores.Info("3. ATUALIZAR UMA CONTA");
         Cores.Info("4. DELETAR UMA CONTA");
-        Cores.Info("5. REALIZAR SAQUE");
-        Cores.Info("6. REALIZAR DEPÓSITO");
-        Cores.Info("7. REALIZAR TRANSFERÊNCIA");
+        Cores.Info("5. BUSCAR CONTA");
+        Cores.Info("6. REALIZAR SAQUE");
+        Cores.Info("7. REALIZAR DEPÓSITO");
+        Cores.Info("8. REALIZAR TRANSFERÊNCIA");
         Cores.Info("0. SAIR");
         Cores.Separador();
         Cores.Write("Escolha sua opção: ");
@@ -263,10 +269,10 @@ public class Menu
         Cores.Write("Informe o número da conta: ");
         int numero;
         while(!int.TryParse(Console.ReadLine(), out numero))
-    {
-        Cores.Erro("Número inválido!");
-        Cores.Write("Digite novamente: ");        
-    }
+        {
+            Cores.Erro("Número inválido!");
+            Cores.Write("Digite novamente: ");        
+        }
 
         // passa para o controller
         controller.deletar(numero);
@@ -276,6 +282,29 @@ public class Menu
         Console.ReadLine();
     }
 
+    private void buscar(ContaController controller)
+    {
+        Console.Clear();
+
+        Cores.Cabecalho("- BUSCANDO CONTA -");
+
+        // recebe o número da conta
+        int numero;
+
+        Cores.Write("Informe o número da conta: ");
+        while(!int.TryParse(Console.ReadLine(), out numero))
+        {
+            Cores.Erro("Número inválido!");
+            Cores.Write("Digite novamente: ");        
+        }
+
+        // chama a função passando o número        
+        controller.procurarPorNumero(numero);
+
+        Cores.Separador();
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
+    }
     private void sacar(ContaController controller) 
     {
         Console.Clear();
