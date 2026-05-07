@@ -68,7 +68,7 @@ public class ContaCorrente : Conta
         }
 
         // mensagem de erro
-        Cores.Erro($"Não foi possível realizar o saque de R${_valor}. Saldo/Limite insuficiente!");
+        Cores.Erro($"Não foi possível realizar o saque de R${_valor}.\n Saldo/Limite insuficiente!");
 
         return false;
     }

@@ -62,7 +62,7 @@ public class ContaPoupanca : Conta
         }
 
         // retorna mensagem de erro
-        Cores.Erro($"Não foi possível realizar o saque de R${_valor}. Saldo insuficiente!\n");
+        Cores.Erro($"Não foi possível realizar o saque de R${_valor}\n Saldo insuficiente!\n");
         return false;
     }
 }

@@ -195,6 +195,9 @@ public class ContaController : IContaRepository
         // caso exista, chama o método sacar
         bool saqueRealizado = contaExistente.sacar(_valor);
 
+        // visualiza o novo saldo
+        contaExistente.visualizar();
+
         // salva no json caso o saque tenha sucesso
         if (saqueRealizado) salvar();
     }
@@ -215,6 +218,9 @@ public class ContaController : IContaRepository
 
         // caso exista, chama o método depositar
         contaExistente.depositar(_valor);
+        
+        // visualiza o novo saldo
+        contaExistente.visualizar();
 
         // salva no json
         salvar();
@@ -336,4 +342,9 @@ public class ContaController : IContaRepository
         }
     }
 
+    // método que viabiliza limpar uma conta para realização de testes xUnit
+    public void LimparContasParaTeste()
+    {
+        contasCadastradas.Clear();
+    }
 }
