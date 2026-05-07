@@ -306,6 +306,9 @@ public class ContaController : IContaRepository
             {
                 // carrega os dados importados na coleção contasCadastradas
                 contasCadastradas = colecao;
+                
+                // caso não tenha exeções, notifica sucesso e retorna true
+                Cores.Sucesso("Dados carregados com sucesso!");
             }
         }
         // trata exceção (falha na coleta dos dados)
@@ -314,13 +317,11 @@ public class ContaController : IContaRepository
             Cores.Erro($"Erro ao carregar os dados: {ex.Message}");
         }
 
-        // caso não tenha exeções, notifica sucesso e retorna true
-        Cores.Sucesso("Dados carregados com sucesso!");
         return true;
     }
 
     // Salvar
-    public bool salvar()
+    public void salvar()
     {
         try
         {    
@@ -332,11 +333,7 @@ public class ContaController : IContaRepository
         {
             // notifica erro
             Cores.Erro($"Erro ao salvar dados: {ex.Message}");
-            return false;
         }
-
-        // caso não tenha exeções, retorna true
-        return true;
     }
 
 }

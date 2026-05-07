@@ -112,7 +112,7 @@ public class Menu
         string? titular = Console.ReadLine();
         
         // verifica se a string é nula ou apenas espaços
-        while (string.IsNullOrWhiteSpace(titular)) 
+        while (string.IsNullOrWhiteSpace(titular))
         {
             Cores.Erro("Nome inválido!");
             Cores.Write("Insira o nome do Titular: ");
@@ -125,7 +125,7 @@ public class Menu
         // gera a Agência
         int agencia = numero * 11;
         
-        // inicia o saldo com 0
+        // inicia o do com 0
         float saldo = 0f;
 
         // recebe o Tipo

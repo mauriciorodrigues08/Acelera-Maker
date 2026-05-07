@@ -15,15 +15,24 @@
     "tipo": 2,
     "numero": 2,
     "agencia": 22,
-    "saldo": 2000
+    "saldo": 2600
   },
   {
     "tipoConta": "corrente",
-    "limite": 2000,
+    "limite": 1800,
     "titular": "joao",
     "tipo": 1,
     "numero": 3,
     "agencia": 33,
+    "saldo": 0
+  },
+  {
+    "tipoConta": "poupanca",
+    "aniversario": 2006,
+    "titular": "jose",
+    "tipo": 2,
+    "numero": 4,
+    "agencia": 44,
     "saldo": 0
   }
 ]
