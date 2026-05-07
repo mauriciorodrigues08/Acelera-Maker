@@ -34,5 +34,23 @@
     "numero": 4,
     "agencia": 44,
     "saldo": 0
+  },
+  {
+    "tipoConta": "poupanca",
+    "aniversario": 2006,
+    "titular": "luis",
+    "tipo": 2,
+    "numero": 5,
+    "agencia": 55,
+    "saldo": 100
+  },
+  {
+    "tipoConta": "corrente",
+    "limite": 1500,
+    "titular": "joana",
+    "tipo": 1,
+    "numero": 6,
+    "agencia": 66,
+    "saldo": 1000
   }
 ]

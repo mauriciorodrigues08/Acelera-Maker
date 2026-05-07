@@ -131,8 +131,13 @@ public class Menu
         // gera a Agência
         int agencia = numero * 11;
         
-        // inicia o do com 0
-        float saldo = 0f;
+        // recebe o saldo inicial
+        float saldo;
+        Cores.Write("Informe o saldo inicial: ");
+        while (!float.TryParse(Console.ReadLine(), out saldo))
+        {   
+            Cores.Erro("Valor inválido! Digite novamente: ");
+        }        
 
         // recebe o Tipo
         Cores.Write("Informe o Tipo da Nova Conta (1. Corrente ou 2. Poupança): ");
@@ -305,6 +310,7 @@ public class Menu
         Cores.Write("\nPressione enter para voltar ao menu...");
         Console.ReadLine();
     }
+    
     private void sacar(ContaController controller) 
     {
         Console.Clear();
