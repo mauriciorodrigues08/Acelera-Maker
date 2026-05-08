@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Projeto_Conta_Bancaria.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0f21e47659606505b9ad20ec41fc25b5911957cf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+52b8306bdcde5976db4003a19b72d7131c8e4409")]
 [assembly: System.Reflection.AssemblyProductAttribute("Projeto_Conta_Bancaria.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Projeto_Conta_Bancaria.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
