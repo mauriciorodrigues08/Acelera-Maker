@@ -6,7 +6,21 @@
     "tipo": 1,
     "numero": 1,
     "agencia": 11,
-    "saldo": 200
+    "saldo": 3700,
+    "transacoes": [
+      {
+        "valor": 2000,
+        "titularOutraParte": "maria"
+      },
+      {
+        "valor": 1000,
+        "titularOutraParte": "Dep\u00F3sito"
+      },
+      {
+        "valor": -500,
+        "titularOutraParte": "Saque"
+      }
+    ]
   },
   {
     "tipoConta": "poupanca",
@@ -15,42 +29,22 @@
     "tipo": 2,
     "numero": 2,
     "agencia": 22,
-    "saldo": 2600
+    "saldo": 8000,
+    "transacoes": [
+      {
+        "valor": -2000,
+        "titularOutraParte": "mauricio"
+      }
+    ]
   },
   {
     "tipoConta": "corrente",
-    "limite": 1800,
-    "titular": "joao",
+    "limite": 50000,
+    "titular": "joana",
     "tipo": 1,
     "numero": 3,
     "agencia": 33,
-    "saldo": 0
-  },
-  {
-    "tipoConta": "poupanca",
-    "aniversario": 2006,
-    "titular": "jose",
-    "tipo": 2,
-    "numero": 4,
-    "agencia": 44,
-    "saldo": 0
-  },
-  {
-    "tipoConta": "poupanca",
-    "aniversario": 2006,
-    "titular": "luis",
-    "tipo": 2,
-    "numero": 5,
-    "agencia": 55,
-    "saldo": 100
-  },
-  {
-    "tipoConta": "corrente",
-    "limite": 1500,
-    "titular": "joana",
-    "tipo": 1,
-    "numero": 6,
-    "agencia": 66,
-    "saldo": 1000
+    "saldo": 1000000,
+    "transacoes": []
   }
 ]

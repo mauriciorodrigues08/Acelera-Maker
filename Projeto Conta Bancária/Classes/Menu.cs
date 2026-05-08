@@ -29,7 +29,7 @@ public class Menu
             Console.Clear();
             // exibe o menu e recebe a opção
             printMenu();
-            while(!int.TryParse(Console.ReadLine(), out op) || op < 0 || op > 7)
+            while(!int.TryParse(Console.ReadLine(), out op) || op < 0 || op > 9)
             {
                 Cores.Erro("Opção inválida!");
                 Cores.Write("Digite novamente: ");
@@ -64,7 +64,7 @@ public class Menu
                     deletar(controller);
                     break;
 
-                // saque
+                // buscar
                 case 5:
                     buscar(controller);
                     break;
@@ -83,6 +83,11 @@ public class Menu
                 case 8:
                     transferir(controller);
                     break;
+
+                // histórico de transações
+                case 9:
+                    historicoTransacoes(controller);
+                    break;
             }
 
         } while(op != 0);
@@ -100,6 +105,7 @@ public class Menu
         Cores.Info("6. REALIZAR SAQUE");
         Cores.Info("7. REALIZAR DEPÓSITO");
         Cores.Info("8. REALIZAR TRANSFERÊNCIA");
+        Cores.Info("9. HISTÓRICO DE TRANSAÇÕES");
         Cores.Info("0. SAIR");
         Cores.Separador();
         Cores.Write("Escolha sua opção: ");
@@ -202,68 +208,68 @@ public class Menu
     }
 
     private void atualizar(ContaController controller)
-{
-    Console.Clear();
-    Cores.Cabecalho("- ATUALIZANDO CONTA -");
-
-    // recebe o número
-    Cores.Write("Informe o número da conta: ");
-    int numero;
-    while(!int.TryParse(Console.ReadLine(), out numero))
     {
-        Cores.Erro("Número inválido!");
-        Cores.Write("Digite novamente: ");        
+        Console.Clear();
+        Cores.Cabecalho("- ATUALIZANDO CONTA -");
+
+        // recebe o número
+        Cores.Write("Informe o número da conta: ");
+        int numero;
+        while(!int.TryParse(Console.ReadLine(), out numero))
+        {
+            Cores.Erro("Número inválido!");
+            Cores.Write("Digite novamente: ");        
+        }
+
+        // busca a conta para saber o tipo e exibir os dados atuais
+        Conta? conta = controller.buscarNaCollection(numero);
+        if (conta == null)
+        {
+            Cores.Erro("\nConta não encontrada!");
+            return;
+        }
+
+        // exibe os dados atuais
+        conta.visualizar();
+
+        // coleta o novo titular
+        Cores.Write("Novo titular: ");
+        string? titular = Console.ReadLine();
+        
+        // verifica se a string é nula ou apenas espaços
+        while (string.IsNullOrWhiteSpace(titular)) 
+        {
+            Cores.Erro("Nome inválido!");
+            Cores.Write("Insira o nome do Titular: ");
+            titular = Console.ReadLine();
+        }
+
+        // coleta dados específicos por tipo
+        if (conta.getTipo() == 1)
+        {
+            Cores.Write("Novo limite: ");
+            float limite;
+            while (!float.TryParse(Console.ReadLine(), out limite))
+                Cores.Erro("Valor inválido! Digite novamente: ");
+
+            // passa tudo pronto para o controller
+            controller.atualizar(numero, titular, limite);
+        }
+        else
+        {
+            Cores.Write("Novo aniversário: ");
+            int aniversario;
+            while (!int.TryParse(Console.ReadLine(), out aniversario) || aniversario < 1900)
+                Cores.Erro("Valor inválido! Digite novamente: ");
+
+            // passa tudo pronto para o controller
+            controller.atualizar(numero, titular, aniversario);
+        }
+
+        Cores.Separador();
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
     }
-
-    // busca a conta para saber o tipo e exibir os dados atuais
-    Conta? conta = controller.buscarNaCollection(numero);
-    if (conta == null)
-    {
-        Cores.Erro("\nConta não encontrada!");
-        return;
-    }
-
-    // exibe os dados atuais
-    conta.visualizar();
-
-    // coleta o novo titular
-    Cores.Write("Novo titular: ");
-    string? titular = Console.ReadLine();
-    
-    // verifica se a string é nula ou apenas espaços
-    while (string.IsNullOrWhiteSpace(titular)) 
-    {
-        Cores.Erro("Nome inválido!");
-        Cores.Write("Insira o nome do Titular: ");
-        titular = Console.ReadLine();
-    }
-
-    // coleta dados específicos por tipo
-    if (conta.getTipo() == 1)
-    {
-        Cores.Write("Novo limite: ");
-        float limite;
-        while (!float.TryParse(Console.ReadLine(), out limite))
-            Cores.Erro("Valor inválido! Digite novamente: ");
-
-        // passa tudo pronto para o controller
-        controller.atualizar(numero, titular, limite);
-    }
-    else
-    {
-        Cores.Write("Novo aniversário: ");
-        int aniversario;
-        while (!int.TryParse(Console.ReadLine(), out aniversario) || aniversario < 1900)
-            Cores.Erro("Valor inválido! Digite novamente: ");
-
-        // passa tudo pronto para o controller
-        controller.atualizar(numero, titular, aniversario);
-    }
-
-    Cores.Separador();
-    Cores.Write("\nPressione enter para voltar ao menu...");
-    Console.ReadLine();
-}
 
     private void deletar(ContaController controller) 
     {
@@ -412,4 +418,25 @@ public class Menu
         Console.ReadLine();
     }
 
+    private void historicoTransacoes(ContaController controller)
+    {
+        Console.Clear();
+        Cores.Cabecalho("- HISTÓRICO DE TRANSAÇÕES -");
+
+        // recebe o número da conta
+        Cores.Write("Informe o número da conta: ");
+        int numero;
+        while(!int.TryParse(Console.ReadLine(), out numero))
+        {
+            Cores.Erro("Número inválido!");
+            Cores.Write("Digite novamente: ");        
+        }
+
+        // passa para o controller
+        controller.mostrarTransacoes(numero);
+
+        Cores.Separador();
+        Cores.Write("\nPressione enter para voltar ao menu...");
+        Console.ReadLine();
+    }
 }

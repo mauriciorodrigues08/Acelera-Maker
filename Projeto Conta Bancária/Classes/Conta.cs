@@ -15,12 +15,14 @@ public abstract class Conta
     [JsonInclude] internal int numero;
     [JsonInclude] internal int agencia;
     [JsonInclude] internal float saldo;
+    [JsonInclude] internal List<Transacao> transacoes;
 
     // construtores
     [JsonConstructor]
     protected Conta()
     {
         this.titular = "";
+        this.transacoes = new List<Transacao>();
     }
     public Conta(int _numero = 0, int _agencia = 0, int _tipo = 0, string _titular = "", float _saldo = 0)
     {
@@ -29,6 +31,7 @@ public abstract class Conta
         tipo = _tipo;
         titular = _titular;
         setSaldo(_saldo);
+        transacoes = new List<Transacao>();
     }
 
     // getters
@@ -55,6 +58,11 @@ public abstract class Conta
     public float getSaldo()
     {
         return this.saldo;
+    }
+
+    public List<Transacao> getTransacoes()
+    {
+        return this.transacoes;
     }
 
     // setters
@@ -90,17 +98,33 @@ public abstract class Conta
         }
     }
 
+    // registrar transação (mantém apenas as últimas 10)
+    public void registrarTransacao(float _valor, string _titularOutraParte)
+    {
+        transacoes.Add(new Transacao(_valor, _titularOutraParte));
+
+        // mantém apenas as últimas 10
+        if (transacoes.Count > 10)
+        {
+            transacoes.RemoveAt(0);
+        }
+    }
+
     // sacar
-    public abstract bool sacar(float _valor, bool transf = false);
+    public abstract bool sacar(float _valor, bool transf = false, string titularOutraParte = "");
 
     //depositar
-    public void depositar(float _valor, bool transf = false)
+    public void depositar(float _valor, bool transf = false, string titularOutraParte = "")
     {
         if (_valor > 0)
         {
             setSaldo(getSaldo() + _valor);
+
+            // registra a transação (valor positivo = recebido)
+            string outraParte = string.IsNullOrWhiteSpace(titularOutraParte) ? "Depósito" : titularOutraParte;
+            registrarTransacao(+_valor, outraParte);
             
-            // verifica se o depósit é parte de uma transferência
+            // verifica se o depósito é parte de uma transferência
             if (!transf)
             {
                 // caso não for, notifica o sucesso

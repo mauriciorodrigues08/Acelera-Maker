@@ -67,6 +67,9 @@ public class ContaController : IContaRepository
             _limite
         );
 
+        // preserva o histórico de transações
+        contaAtt.transacoes = contaExistente.getTransacoes();
+
         // atualiza a conta na coleção
         contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = contaAtt;
         Cores.Sucesso($"\nConta de número {_numero} atualizada com sucesso!");
@@ -92,6 +95,9 @@ public class ContaController : IContaRepository
             contaExistente.getSaldo(),
             _aniversario
         );
+
+        // preserva o histórico de transações
+        contaAtt.transacoes = contaExistente.getTransacoes();
 
         // atualiza a conta na coleção
         contasCadastradas[contasCadastradas.IndexOf(contaExistente)] = contaAtt;
@@ -252,11 +258,13 @@ public class ContaController : IContaRepository
         if (confirmacao?.ToUpper() == "S")
         {
             // verifica se a Conta de Origem possui o valor desejado
-            bool saqueRealizado = contaOrigem.sacar(_valor, true);
+            // passa o titular do destinatário para registrar na transação da origem
+            bool saqueRealizado = contaOrigem.sacar(_valor, true, contaDestino.getTitular());
             if (!saqueRealizado) return;
 
             // caso o saque seja feito, credita na conta de destino
-            contaDestino.depositar(_valor, true);
+            // passa o titular da origem para registrar na transação do destino
+            contaDestino.depositar(_valor, true, contaOrigem.getTitular());
             Cores.Sucesso($"\nTransferência de R${_valor} concluída com sucesso!");
 
             // salva no json
@@ -270,7 +278,56 @@ public class ContaController : IContaRepository
         {
             Cores.Erro("\nChave inválida! Operação Cancelada!");
         }
+    }
 
+    // MOSTRAR HISTÓRICO DE TRANSAÇÕES
+    public void mostrarTransacoes(int _numero)
+    {
+        // busca a conta
+        Conta? contaExistente = buscarNaCollection(_numero);
+
+        // caso não exista, notifica
+        if (contaExistente == null)
+        {
+            Cores.Erro($"\nConta de número {_numero} não está cadastrada!\n");
+            return;
+        }
+
+        List<Transacao> transacoes = contaExistente.getTransacoes();
+
+        Cores.Cabecalho($"EXTRATO - {contaExistente.getTitular()}");
+        Cores.Info($"Conta: {contaExistente.getNumero()} | Agência: {contaExistente.getAgencia()}\n");
+
+        // verifica se existem transações
+        if (transacoes.Count == 0)
+        {
+            Cores.Aviso("Nenhuma transação registrada até o momento.");
+            return;
+        }
+
+        Cores.Info($"{"Valor",-15} {"Contraparte",-30}");
+        Cores.Separador('-', 45);
+
+        // exibe as últimas 10 (ou menos) em ordem da mais recente para a mais antiga
+        var ultimas = transacoes.Count > 10
+            ? transacoes.GetRange(transacoes.Count - 10, 10)
+            : transacoes;
+
+        for (int i = ultimas.Count - 1; i >= 0; i--)
+        {
+            Transacao t = ultimas[i];
+            string valorFormatado = t.getValor() >= 0
+                ? $"+R${t.getValor():F2}"
+                : $"-R${Math.Abs(t.getValor()):F2}";
+
+            if (t.getValor() >= 0)
+                Cores.Sucesso($"{valorFormatado,-15} {t.getTitularOutraParte(),-30}");
+            else
+                Cores.Erro($"{valorFormatado,-15} {t.getTitularOutraParte(),-30}");
+        }
+
+        Cores.Separador('-', 45);
+        Cores.Info($"Saldo atual: R${contaExistente.getSaldo():F2}\n");
     }
 
     // BUSCA UMA CONTA NA BASE DE DADOS

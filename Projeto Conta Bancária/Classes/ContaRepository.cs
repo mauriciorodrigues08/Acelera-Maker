@@ -11,6 +11,7 @@ public interface IContaRepository
     public void sacar(int _numero, float _valor);
     public void depositar(int _numero, float _valor);
     public void transferir(int _numeroOrigem, int _numeroDestino, float _valor);
+    public void mostrarTransacoes(int _numero);
     public bool carregar();
     public void salvar();
 }

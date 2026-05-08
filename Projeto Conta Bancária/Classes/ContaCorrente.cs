@@ -38,7 +38,7 @@ public class ContaCorrente : Conta
     }
 
     // sacar
-    public override bool sacar(float _valor, bool transf = false)
+    public override bool sacar(float _valor, bool transf = false, string titularOutraParte = "")
     {
         // verifica se é possível realizar o saque
         if ( (_valor > 0) && (_valor <= this.getSaldo() + getLimite()) )
@@ -56,6 +56,10 @@ public class ContaCorrente : Conta
                 // apenas debita do saldo atual
                 this.setSaldo(this.getSaldo() - _valor);
             }
+
+            // registra a transação (valor negativo = enviado)
+            string outraParte = string.IsNullOrWhiteSpace(titularOutraParte) ? "Saque" : titularOutraParte;
+            registrarTransacao(-_valor, outraParte);
             
             // verifica se o saque é parte de uma transação
             if (!transf)
