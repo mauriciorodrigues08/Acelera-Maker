@@ -32,9 +32,6 @@ C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\Blo
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\obj\Debug\net10.0\BlogPessoal.pdb
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\obj\Debug\net10.0\BlogPessoal.genruntimeconfig.cache
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\obj\Debug\net10.0\ref\BlogPessoal.dll
-C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
-C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Humanizer.dll
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Microsoft.CodeAnalysis.dll
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Microsoft.CodeAnalysis.CSharp.dll
@@ -132,3 +129,4 @@ C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\Blo
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\bin\Debug\net10.0\Scalar.AspNetCore.dll
