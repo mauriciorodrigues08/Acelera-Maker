@@ -2,6 +2,7 @@
 // Gerencia criação, atualização, exclusão e listagem de postagens.
 // Todos os endpoints são protegidos por autenticação JWT.
 
+using BlogPessoal.DTOs;
 using BlogPessoal.Models;
 using BlogPessoal.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +15,6 @@ namespace BlogPessoal.Controllers;
 [Route("api/postagens")]
 public class PostagemController : ControllerBase
 {
-    // Injeta o serviço de postagens via injeção de dependência
     private readonly IPostagemService _postagemService;
 
     public PostagemController(IPostagemService postagemService)
@@ -22,118 +22,101 @@ public class PostagemController : ControllerBase
         _postagemService = postagemService;
     }
 
+    // mapeia a entidade Postagem para o DTO de resposta
+    private static PostagemResponseDTO MapToDTO(Postagem p) => new()
+    {
+        Id = p.Id,
+        Titulo = p.Titulo,
+        Texto = p.Texto,
+        Data = p.Data,
+        ResumoIA = p.ResumoIA,
+        TagsIA = p.TagsIA,
+        CategoriaIA = p.CategoriaIA,
+        Tema = p.Tema is null ? null : new TemaResumoDTO
+        {
+            Id = p.Tema.Id,
+            Descricao = p.Tema.Descricao
+        },
+        Usuario = p.Usuario is null ? null : new UsuarioResumoDTO
+        {
+            Id = p.Usuario.Id,
+            Nome = p.Usuario.Nome,
+            Email = p.Usuario.Email,
+            Foto = p.Usuario.Foto
+        }
+    };
+
     // GET api/postagens
-    // Retorna todas as postagens com Tema e Usuario incluídos
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        // busca todas as postagens
         var postagens = await _postagemService.GetAllAsync();
-
-        // retorna 200 com a lista de postagens
-        return Ok(postagens);
+        // converte cada postagem para o DTO antes de retornar
+        return Ok(postagens.Select(MapToDTO));
     }
 
     // GET api/postagens/{id}
-    // Retorna uma postagem pelo ID
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(long id)
     {
-        // busca a postagem pelo ID
         var postagem = await _postagemService.GetByIdAsync(id);
-
-        // retorna 404 caso a postagem não for encontrada
         if (postagem is null) return NotFound();
-
-        // retorna 200 com a postagem encontrada
-        return Ok(postagem);
+        // converte para DTO antes de retornar
+        return Ok(MapToDTO(postagem));
     }
 
-    // GET api/postagens/filtro?autor={id}&tema={id}
-    // Filtra postagens por autor e/ou tema
+    // GET api/postagens/filtro
     [HttpGet("filtro")]
     public async Task<IActionResult> GetByFiltro(
         [FromQuery] long? autor,
         [FromQuery] long? tema)
     {
-        // retorna 400 se nenhum filtro for informado
         if (autor is null && tema is null)
-            return BadRequest("Informe ao menos um filtro (autor ou tema).");
+            return BadRequest("Informe ao menos um filtro: autor ou tema.");
 
-        // filtra por autor se o parâmetro for informado
         if (autor is not null)
         {
-            // busca postagens pelo ID do autor
             var porAutor = await _postagemService.GetByAutorAsync(autor.Value);
-         
-            // retorna 200 com as postagens encontradas
-            return Ok(porAutor);
+            return Ok(porAutor.Select(MapToDTO));
         }
 
-        // filtra por tema se o parâmetro for informado
-        // busca postagens pelo ID do tema
         var porTema = await _postagemService.GetByTemaAsync(tema!.Value);
-
-        // retorna 200 com as postagens encontradas
-        return Ok(porTema);
+        return Ok(porTema.Select(MapToDTO));
     }
 
     // POST api/postagens
-    // Cria uma nova postagem vinculada a um Tema e um Usuario
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Postagem postagem)
     {
-        // retorna 400 se os dados enviados não passarem nas validações do modelo
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        // tenta criar a postagem
         var created = await _postagemService.CreateAsync(postagem);
-
-        // retorna 400 se o Tema ou Usuario informado não existir
         if (created is null)
             return BadRequest("Tema ou Usuário informado não existe.");
 
-        // retorna 201 com a postagem criada
-        return CreatedAtAction(
-                            nameof(GetById),
-                            new { id = created.Id },
-                            created
-                            );
+        return CreatedAtAction(nameof(GetById),
+            new { id = created.Id }, MapToDTO(created));
     }
 
     // PUT api/postagens/{id}
-    // Atualiza uma postagem existente
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(long id, [FromBody] Postagem postagem)
     {
-        // retorna 400 se os dados enviados não passarem nas validações do modelo
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        // garante que o ID da rota é o mesmo do corpo da requisição
         postagem.Id = id;
 
-        // tenta atualizar a postagem
         var updated = await _postagemService.UpdateAsync(postagem);
-        
-        // retorna 404 caso a postagem não for encontrada
         if (updated is null) return NotFound();
-        
-        // retorna 200 com a postagem atualizada
-        return Ok(updated);
+        return Ok(MapToDTO(updated));
     }
 
     // DELETE api/postagens/{id}
-    // Remove uma postagem pelo ID
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id)
     {
-        // tenta deletar a postagem
         var deleted = await _postagemService.DeleteAsync(id);
-
-        // retorna 404 caso a postagem não for encontrada
         if (!deleted) return NotFound();
-
-        // retorna 204 se for excluída com sucesso
         return NoContent();
     }
 }

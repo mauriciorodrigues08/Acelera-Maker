@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using BlogPessoal.Services.IA;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,9 +51,17 @@ builder.Services.AddScoped<ITemaService, TemaService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IPostagemService, PostagemService>();
 builder.Services.AddScoped<JwtService>();
+// Serviço de IA — registra o HttpClient e o GeminiService
+builder.Services.AddHttpClient<IIAService, GeminiService>();
 
 // CONTROLLERS E DOCUMENTAÇÃO
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // ignora ciclos de referência na serialização JSON
+        options.JsonSerializerOptions.ReferenceHandler = 
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 

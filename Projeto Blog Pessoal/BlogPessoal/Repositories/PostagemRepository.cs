@@ -62,14 +62,33 @@ public class PostagemRepository : IPostagemRepository
     // O EF Core preenche o Id e a Data automaticamente
     public async Task<Postagem> CreateAsync(Postagem postagem)
     {
+        // Busca os objetos reais do banco pelo ID
+        // evitando que o EF Core tente inserir duplicatas
+        if (postagem.Tema is not null)
+            postagem.Tema = await _context.Temas
+                .FindAsync(postagem.Tema.Id);
+
+        if (postagem.Usuario is not null)
+            postagem.Usuario = await _context.Usuarios
+                .FindAsync(postagem.Usuario.Id);
+
         _context.Postagens.Add(postagem);
         await _context.SaveChangesAsync();
         return postagem;
     }
 
-    // Marca a postagem como modificada no contexto e persiste as alterações
     public async Task<Postagem> UpdateAsync(Postagem postagem)
     {
+        // Busca os objetos reais do banco pelo ID
+        // evitando que o EF Core tente inserir duplicatas
+        if (postagem.Tema is not null)
+            postagem.Tema = await _context.Temas
+                .FindAsync(postagem.Tema.Id);
+
+        if (postagem.Usuario is not null)
+            postagem.Usuario = await _context.Usuarios
+                .FindAsync(postagem.Usuario.Id);
+
         _context.Postagens.Update(postagem);
         await _context.SaveChangesAsync();
         return postagem;

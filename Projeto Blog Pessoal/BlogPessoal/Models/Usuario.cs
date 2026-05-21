@@ -34,9 +34,9 @@ public class Usuario
     public string? Email { get; set; }
 
     // senha (hash da senha, e não string pura)
+    [JsonIgnore]
     [Column(TypeName = "varchar(255)")]
-    [StringLength(255, MinimumLength = 8,
-        ErrorMessage = "A Senha deve ter no mínimo 8 caracteres.")]
+    [StringLength(255, MinimumLength = 8, ErrorMessage = "A Senha deve ter no mínimo 8 caracteres.")]
     public string? Senha { get; set; }
 
     // foto (url da foto)
