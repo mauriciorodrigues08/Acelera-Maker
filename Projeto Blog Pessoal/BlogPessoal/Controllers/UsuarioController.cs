@@ -3,6 +3,7 @@
 // O endpoint de cadastro e login são públicos (sem JWT).
 // Os demais endpoints são protegidos por autenticação JWT.
 
+using BlogPessoal.DTOs;
 using BlogPessoal.Models;
 using BlogPessoal.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,15 @@ public class UsuarioController : ControllerBase
         _usuarioService = usuarioService;
     }
 
+    // mapeia a entidade Usuario para o DTO de resposta sem expor a senha
+    private static UsuarioResponseDTO MapToDTO(Usuario u) => new()
+    {
+        Id = u.Id,
+        Nome = u.Nome,
+        Email = u.Email,
+        Foto = u.Foto
+    };
+
     // GET api/usuarios
     // Retorna todos os usuários cadastrados
     [HttpGet]
@@ -30,9 +40,8 @@ public class UsuarioController : ControllerBase
     {
         // busca todos os usuários
         var usuarios = await _usuarioService.GetAllAsync();
-
-        // retorna 200 com a lista de usuários
-        return Ok(usuarios);
+        // converte cada usuario para o DTO antes de retornar
+        return Ok(usuarios.Select(MapToDTO));
     }
 
     // GET api/usuarios/{id}
@@ -46,8 +55,8 @@ public class UsuarioController : ControllerBase
         // retorna 404 caso o usuário não for encontrado
         if (usuario is null) return NotFound();
 
-        // retorna 200 com o usuário encontrado
-        return Ok(usuario);
+        // converte para DTO antes de retornar
+        return Ok(MapToDTO(usuario));
     }
 
     // POST api/usuarios/cadastrar
@@ -65,12 +74,11 @@ public class UsuarioController : ControllerBase
         // retorna 409 se o email já estiver em uso
         if (created is null) return Conflict("Email já cadastrado.");
 
-        // retorna 201 com o usuário criado
+        // converte para DTO antes de retornar
         return CreatedAtAction(
                             nameof(GetById),
                             new { id = created.Id },
-                            created
-                            );
+                            MapToDTO(created));
     }
 
     // PUT api/usuarios/{id}
@@ -86,10 +94,12 @@ public class UsuarioController : ControllerBase
 
         // tenta atualizar o usuário
         var updated = await _usuarioService.UpdateAsync(usuario);
+
         // retorna 404 caso o usuário não for encontrado
         if (updated is null) return NotFound();
-        // retorna 200 com o usuário atualizado
-        return Ok(updated);
+
+        // converte para DTO antes de retornar
+        return Ok(MapToDTO(updated));
     }
 
     // DELETE api/usuarios/{id}
@@ -99,7 +109,7 @@ public class UsuarioController : ControllerBase
     {
         // tenta deletar o usuário
         var deleted = await _usuarioService.DeleteAsync(id);
-        
+
         // retorna 404 caso o usuário não for encontrado
         if (!deleted) return NotFound();
 
@@ -121,7 +131,7 @@ public class UsuarioController : ControllerBase
 
         // retorna 401 se as credenciais forem inválidas
         if (token is null) return Unauthorized("Email ou senha inválidos.");
-
+        
         // retorna 200 com o token JWT gerado
         return Ok(new { token });
     }
