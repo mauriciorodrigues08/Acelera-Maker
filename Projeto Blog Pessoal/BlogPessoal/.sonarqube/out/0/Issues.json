@@ -1,0 +1,161 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Compilador do Microsoft (R) Visual C#",
+        "version": "5.3.0.0",
+        "fileVersion": "5.3.0-2.26219.105 (c23858a6d860abe3ca94f9ac630c3e61b2625664)",
+        "semanticVersion": "5.3.0",
+        "language": "pt-BR"
+      },
+      "results": [
+        {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename class 'TemaResumoDTO' to match pascal case naming rules, consider using 'TemaResumoDto'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto%20Blog%20Pessoal/BlogPessoal/DTOs/PostagemResponseDTO.cs",
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 14,
+                  "endLine": 24,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename class 'PostagemResponseDTO' to match pascal case naming rules, consider using 'PostagemResponseDto'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto%20Blog%20Pessoal/BlogPessoal/DTOs/PostagemResponseDTO.cs",
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 14,
+                  "endLine": 7,
+                  "endColumn": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename class 'PostagemRequestDTO' to match pascal case naming rules, consider using 'PostagemRequestDto'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto%20Blog%20Pessoal/BlogPessoal/DTOs/PostagemRequestDTO.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 14,
+                  "endLine": 5,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename class 'UsuarioResumoDTO' to match pascal case naming rules, consider using 'UsuarioResumoDto'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto%20Blog%20Pessoal/BlogPessoal/DTOs/PostagemResponseDTO.cs",
+                "region": {
+                  "startLine": 30,
+                  "startColumn": 14,
+                  "endLine": 30,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename class 'UsuarioRequestDTO' to match pascal case naming rules, consider using 'UsuarioRequestDto'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto%20Blog%20Pessoal/BlogPessoal/DTOs/UsuarioRequest.cs",
+                "region": {
+                  "startLine": 6,
+                  "startColumn": 18,
+                  "endLine": 6,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename class 'UsuarioResponseDTO' to match pascal case naming rules, consider using 'UsuarioResponseDto'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto%20Blog%20Pessoal/BlogPessoal/DTOs/UsuarioResponseDTO.cs",
+                "region": {
+                  "startLine": 3,
+                  "startColumn": 14,
+                  "endLine": 3,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        }
+      ],
+      "rules": {
+        "S101": {
+          "id": "S101",
+          "shortDescription": "Types should be named in PascalCase",
+          "fullDescription": "Shared naming conventions allow teams to collaborate efficiently.",
+          "defaultLevel": "warning",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

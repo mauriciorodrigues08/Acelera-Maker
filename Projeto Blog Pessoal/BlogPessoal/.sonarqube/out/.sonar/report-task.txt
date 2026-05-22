@@ -1,0 +1,6 @@
+projectKey=blog-pessoal-dotnet
+serverUrl=http://localhost:9000
+serverVersion=26.5.0.122743
+dashboardUrl=http://localhost:9000/dashboard?id=blog-pessoal-dotnet
+ceTaskId=fbc69024-f36c-49ba-ad2f-34e99cbb9511
+ceTaskUrl=http://localhost:9000/api/ce/task?id=fbc69024-f36c-49ba-ad2f-34e99cbb9511

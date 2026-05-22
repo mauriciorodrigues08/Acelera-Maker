@@ -17,6 +17,7 @@ public class Tema
 {
     [Key] // marca o campo como chave primária
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // gera id automatico com autoincrement
+    [System.Text.Json.Serialization.JsonRequired]
     public long Id { get; set; }
 
     // descrição do tema

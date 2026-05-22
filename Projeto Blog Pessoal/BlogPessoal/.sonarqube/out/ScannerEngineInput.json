@@ -1,0 +1,136 @@
+{
+  "scannerProperties": [
+    {
+      "key": "sonar.scanner.app",
+      "value": "ScannerMSBuild"
+    },
+    {
+      "key": "sonar.scanner.appVersion",
+      "value": "11.2.1"
+    },
+    {
+      "key": "sonar.scanner.bootstrapStartTime",
+      "value": "1779481429000"
+    },
+    {
+      "key": "sonar.projectKey",
+      "value": "blog-pessoal-dotnet"
+    },
+    {
+      "key": "sonar.working.directory",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\.sonar"
+    },
+    {
+      "key": "sonar.projectBaseDir",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal"
+    },
+    {
+      "key": "sonar.pullrequest.cache.basepath",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal"
+    },
+    {
+      "key": "sonar.sources",
+      "value": ""
+    },
+    {
+      "key": "sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "sonar.modules",
+      "value": "20B98393-43A4-E386-15FF-47545BD6C5B5,5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.projectKey",
+      "value": "blog-pessoal-dotnet:20B98393-43A4-E386-15FF-47545BD6C5B5"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.projectName",
+      "value": "BlogPessoal"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.projectBaseDir",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.working.directory",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\.sonar\\mod0"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.sourceEncoding",
+      "value": "utf-8"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.sources",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Controllers\\IA\\IAController.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Controllers\\PostagemController.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Controllers\\TemaController.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Controllers\\UsuarioController.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Data\\AppDbContext.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\DTOs\\PostagemRequestDTO.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\DTOs\\PostagemResponseDTO.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\DTOs\\ResultadoIA.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\DTOs\\UsuarioRequest.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\DTOs\\UsuarioResponseDTO.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Migrations\\20260519112909_IniciandoBancoDeDados.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Migrations\\20260519112909_IniciandoBancoDeDados.Designer.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Migrations\\20260522182942_AddRequiredFields.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Migrations\\20260522182942_AddRequiredFields.Designer.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Migrations\\AppDbContextModelSnapshot.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Models\\Postagem.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Models\\Tema.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Models\\Usuario.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Models\\UsuarioLogin.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Program.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Repositories\\IPostagemRepository.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Repositories\\ITemaRepository.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Repositories\\IUsuarioRepository.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Repositories\\PostagemRepository.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Repositories\\TemaRepository.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Repositories\\UsuarioRepository.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\IA\\GeminiService.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\IA\\IIAServices.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\IA\\PromptBuild.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\IPostagemService.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\ITemaServices.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\IUsuarioServices.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\JwtService.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\PostagemService.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\TemaService.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Services\\UsuarioService.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\BlogPessoal.GlobalUsings.g.cs,\"C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\.NETCoreApp,Version=v10.0.AssemblyAttributes.cs\",C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\BlogPessoal.AssemblyInfo.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\BlogPessoal.MvcApplicationPartsAssemblyInfo.cs,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\appsettings.Development.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\appsettings.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.gitignore,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\BlogPessoal.http,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\Properties\\launchSettings.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\BlogPessoal.csproj.nuget.dgspec.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\project.assets.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\bin\\Debug\\net10.0\\appsettings.Development.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\bin\\Debug\\net10.0\\appsettings.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\bin\\Debug\\net10.0\\BlogPessoal.deps.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\bin\\Debug\\net10.0\\BlogPessoal.runtimeconfig.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\bin\\Debug\\net10.0\\BlogPessoal.staticwebassets.endpoints.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\BlogPessoal.sourcelink.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\rjsmcshtml.dswa.cache.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\rjsmrazor.dswa.cache.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\rpswa.dswa.cache.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\staticwebassets.build.endpoints.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\obj\\Debug\\net10.0\\staticwebassets.build.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\bin\\Debug\\net10.0\\BuildHost-net472\\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.exe.config,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\bin\\Debug\\net10.0\\BuildHost-netcore\\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.deps.json,C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\bin\\Debug\\net10.0\\BuildHost-netcore\\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.runtimeconfig.json"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.cs.analyzer.projectOutPaths",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\0"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.cs.roslyn.reportFilePaths",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\0\\Issues.json"
+    },
+    {
+      "key": "20B98393-43A4-E386-15FF-47545BD6C5B5.sonar.cs.scanner.telemetry",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\0\\Telemetry.json"
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.projectKey",
+      "value": "blog-pessoal-dotnet:5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7"
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.projectName",
+      "value": "BlogPessoal.Tests"
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.projectBaseDir",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal.Tests"
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.working.directory",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\.sonar\\mod1"
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.sourceEncoding",
+      "value": "utf-8"
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.sources",
+      "value": ""
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.cs.analyzer.projectOutPaths",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\1"
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.cs.roslyn.reportFilePaths",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\1\\Issues.json"
+    },
+    {
+      "key": "5456AFE7-DF0D-0B5D-6554-32DA9F8CEAC7.sonar.cs.scanner.telemetry",
+      "value": "C:\\Users\\mauri\\OneDrive\\Documentos\\GitHub\\Acelera-Maker\\Projeto Blog Pessoal\\BlogPessoal\\.sonarqube\\out\\1\\Telemetry.json"
+    },
+    {
+      "key": "sonar.token",
+      "value": "***"
+    },
+    {
+      "key": "sonar.host.url",
+      "value": "http://localhost:9000"
+    },
+    {
+      "key": "sonar.visualstudio.enable",
+      "value": "false"
+    }
+  ]
+}

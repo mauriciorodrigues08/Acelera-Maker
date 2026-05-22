@@ -9,6 +9,11 @@ namespace BlogPessoal.Services.IA;
 
 public class GeminiService : IIAService
 {
+    private const string CategoriaDefault = "Geral";
+
+    private static readonly JsonSerializerOptions _jsonOptions =
+        new() { PropertyNameCaseInsensitive = true };
+
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
 
@@ -43,7 +48,7 @@ public class GeminiService : IIAService
             {
                 Resumo = $"Serviço de IA indisponível ({(int)response.StatusCode}).",
                 Tags = "",
-                Categoria = "Geral"
+                Categoria = CategoriaDefault
             };
         }
 
@@ -63,14 +68,13 @@ public class GeminiService : IIAService
             text = text.Trim().TrimStart('`').TrimEnd('`');
             if (text.StartsWith("json")) text = text[4..].Trim();
 
-            var resultado = JsonSerializer.Deserialize<ResultadoIA>(text,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var resultado = JsonSerializer.Deserialize<ResultadoIA>(text, _jsonOptions);
 
             return resultado ?? new ResultadoIA
             {
                 Resumo = "Não foi possível gerar o resumo.",
                 Tags = "",
-                Categoria = "Geral"
+                Categoria = CategoriaDefault
             };
         }
         catch (JsonException)
@@ -79,7 +83,7 @@ public class GeminiService : IIAService
             {
                 Resumo = "Resposta inválida da IA.",
                 Tags = "",
-                Categoria = "Geral"
+                Categoria = CategoriaDefault
             };
         }
         catch (InvalidOperationException)
@@ -88,7 +92,7 @@ public class GeminiService : IIAService
             {
                 Resumo = "Estrutura de resposta da IA inesperada.",
                 Tags = "",
-                Categoria = "Geral"
+                Categoria = CategoriaDefault
             };
         }
     }

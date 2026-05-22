@@ -1,0 +1,1 @@
+xRkC:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal\BlogPessoal.csprojòCSharp14

@@ -6,6 +6,7 @@ using BlogPessoal.Models;
 using BlogPessoal.Repositories;
 using BlogPessoal.Services;
 using BlogPessoal.Services.IA;
+using BlogPessoal.DTOs;
 using FluentAssertions;
 using Moq;
 
@@ -16,6 +17,7 @@ public class PostagemServiceTests
     private readonly Mock<IPostagemRepository> _mockPostagemRepo;
     private readonly Mock<ITemaRepository> _mockTemaRepo;
     private readonly Mock<IUsuarioRepository> _mockUsuarioRepo;
+    private readonly Mock<IIAService> _mockIAService;
     private readonly PostagemService _service;
 
     public PostagemServiceTests()
@@ -23,11 +25,22 @@ public class PostagemServiceTests
         _mockPostagemRepo = new Mock<IPostagemRepository>();
         _mockTemaRepo = new Mock<ITemaRepository>();
         _mockUsuarioRepo = new Mock<IUsuarioRepository>();
+        _mockIAService = new Mock<IIAService>();
+
+        _mockIAService
+            .Setup(s => s.GerarResumoAsync(It.IsAny<string>()))
+            .ReturnsAsync(new ResultadoIA
+            {
+                Resumo = "Resumo teste",
+                Tags = "",
+                Categoria = "Geral"
+            });
 
         _service = new PostagemService(
             _mockPostagemRepo.Object,
             _mockTemaRepo.Object,
-            _mockUsuarioRepo.Object
+            _mockUsuarioRepo.Object,
+            _mockIAService.Object
         );
     }
 
@@ -76,7 +89,7 @@ public class PostagemServiceTests
     [Fact]
     public async Task CreateAsync_ComTemaInvalido_DeveRetornarNull()
     {
-        // Arrange — tema não existe
+        // Arrange
         var postagem = new Postagem
         {
             Titulo = "Nova postagem",
@@ -95,7 +108,7 @@ public class PostagemServiceTests
     [Fact]
     public async Task CreateAsync_ComUsuarioInvalido_DeveRetornarNull()
     {
-        // Arrange — usuario não existe
+        // Arrange
         var postagem = new Postagem
         {
             Titulo = "Nova postagem",

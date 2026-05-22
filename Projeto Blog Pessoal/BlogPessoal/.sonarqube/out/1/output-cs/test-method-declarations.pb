@@ -1,0 +1,40 @@
+î
+uC:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal.Tests\UsuarioServiceTests.csBlogPessoal.TestsR
+%BlogPessoal.Tests.UsuarioServiceTests)CreateAsync_ComEmailNovo_DeveCriarUsuarioW
+%BlogPessoal.Tests.UsuarioServiceTests.CreateAsync_ComEmailExistente_DeveRetornarNull[
+%BlogPessoal.Tests.UsuarioServiceTests2LoginAsync_ComCredenciaisValidas_DeveRetornarTokenU
+%BlogPessoal.Tests.UsuarioServiceTests,LoginAsync_ComSenhaInvalida_DeveRetornarNullX
+%BlogPessoal.Tests.UsuarioServiceTests/LoginAsync_ComEmailInexistente_DeveRetornarNullQ
+%BlogPessoal.Tests.UsuarioServiceTests(DeleteAsync_ComIdValido_DeveRetornarTrueT
+%BlogPessoal.Tests.UsuarioServiceTests+DeleteAsync_ComIdInvalido_DeveRetornarFalse­
+rC:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal.Tests\TemaServiceTests.csBlogPessoal.TestsJ
+"BlogPessoal.Tests.TemaServiceTests$GetAllAsync_DeveRetornarListaDeTemasO
+"BlogPessoal.Tests.TemaServiceTests)GetByIdAsync_ComIdValido_DeveRetornarTemaQ
+"BlogPessoal.Tests.TemaServiceTests+GetByIdAsync_ComIdInvalido_DeveRetornarNull?
+"BlogPessoal.Tests.TemaServiceTestsCreateAsync_DeveCriarTemaP
+"BlogPessoal.Tests.TemaServiceTests*UpdateAsync_ComIdInvalido_DeveRetornarNullN
+"BlogPessoal.Tests.TemaServiceTests(DeleteAsync_ComIdValido_DeveRetornarTrueQ
+"BlogPessoal.Tests.TemaServiceTests+DeleteAsync_ComIdInvalido_DeveRetornarFalseü
+vC:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal.Tests\PostagemServiceTests.csBlogPessoal.TestsR
+&BlogPessoal.Tests.PostagemServiceTests(GetAllAsync_DeveRetornarListaDePostagens^
+&BlogPessoal.Tests.PostagemServiceTests4CreateAsync_ComTemaEUsuarioValidos_DeveCriarPostagemV
+&BlogPessoal.Tests.PostagemServiceTests,CreateAsync_ComTemaInvalido_DeveRetornarNullY
+&BlogPessoal.Tests.PostagemServiceTests/CreateAsync_ComUsuarioInvalido_DeveRetornarNull]
+&BlogPessoal.Tests.PostagemServiceTests3UpdateAsync_ComPostagemInexistente_DeveRetornarNullR
+&BlogPessoal.Tests.PostagemServiceTests(DeleteAsync_ComIdValido_DeveRetornarTrueU
+&BlogPessoal.Tests.PostagemServiceTests+DeleteAsync_ComIdInvalido_DeveRetornarFalse€
+yC:\Users\mauri\OneDrive\Documentos\GitHub\Acelera-Maker\Projeto Blog Pessoal\BlogPessoal.Tests\PostagemControllerTests.csBlogPessoal.Testsn
+5BlogPessoal.Tests.Integration.PostagemControllerTests5GetAll_Autenticado_DeveRetornar200ComListaDePostagens_
+5BlogPessoal.Tests.Integration.PostagemControllerTests&GetAll_SemAutenticacao_DeveRetornar401b
+5BlogPessoal.Tests.Integration.PostagemControllerTests)GetById_PostagemExistente_DeveRetornar200d
+5BlogPessoal.Tests.Integration.PostagemControllerTests+GetById_PostagemInexistente_DeveRetornar404]
+5BlogPessoal.Tests.Integration.PostagemControllerTests$GetByFiltro_ComAutor_DeveRetornar200\
+5BlogPessoal.Tests.Integration.PostagemControllerTests#GetByFiltro_ComTema_DeveRetornar200^
+5BlogPessoal.Tests.Integration.PostagemControllerTests%GetByFiltro_SemFiltro_DeveRetornar400_
+5BlogPessoal.Tests.Integration.PostagemControllerTests&Create_ComDadosValidos_DeveRetornar201h
+5BlogPessoal.Tests.Integration.PostagemControllerTests/Create_ComTemaOuUsuarioInvalido_DeveRetornar400c
+5BlogPessoal.Tests.Integration.PostagemControllerTests*Create_ComTituloMuitoCurto_DeveRetornar400d
+5BlogPessoal.Tests.Integration.PostagemControllerTests+Update_ComPostagamExistente_DeveRetornar200f
+5BlogPessoal.Tests.Integration.PostagemControllerTests-Update_ComPostagamInexistente_DeveRetornar404[
+5BlogPessoal.Tests.Integration.PostagemControllerTests"Delete_ComIdValido_DeveRetornar204]
+5BlogPessoal.Tests.Integration.PostagemControllerTests$Delete_ComIdInvalido_DeveRetornar404
