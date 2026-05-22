@@ -13,8 +13,8 @@ Classe UsuarioLogin:
 public class UsuarioLogin
 {
     // email do usuario
-    [Required(ErrorMessage = "O Email é obrigatório.")]
-    [Column(TypeName = "varchar(255)")]
+    [StringLength(255, MinimumLength = 5)]
+    [EmailAddress(ErrorMessage = "Formato de email inválido.")]
     public string? Email { get; set; }
 
     // senha do usuario

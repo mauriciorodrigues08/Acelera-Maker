@@ -16,10 +16,17 @@ namespace BlogPessoal.Controllers;
 public class PostagemController : ControllerBase
 {
     private readonly IPostagemService _postagemService;
+    private readonly ITemaService _temaService;
+    private readonly IUsuarioService _usuarioService;
 
-    public PostagemController(IPostagemService postagemService)
+    public PostagemController(
+        IPostagemService postagemService,
+        ITemaService temaService,
+        IUsuarioService usuarioService)
     {
-        _postagemService = postagemService;
+        _postagemService  = postagemService;
+        _temaService      = temaService;
+        _usuarioService   = usuarioService;
     }
 
     // mapeia a entidade Postagem para o DTO de resposta
@@ -86,28 +93,50 @@ public class PostagemController : ControllerBase
 
     // POST api/postagens
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Postagem postagem)
+    public async Task<IActionResult> Create([FromBody] PostagemRequestDTO dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var created = await _postagemService.CreateAsync(postagem);
-        if (created is null)
-            return BadRequest("Tema ou Usuário informado não existe.");
+        var postagem = new Postagem
+        {
+            Titulo  = dto.Titulo,
+            Texto   = dto.Texto,
+            Tema    = dto.TemaId.HasValue
+                        ? await _temaService.GetByIdAsync(dto.TemaId.Value)
+                        : null,
+            Usuario = dto.UsuarioId.HasValue
+                        ? await _usuarioService.GetByIdAsync(dto.UsuarioId.Value)
+                        : null
+        };
 
-        return CreatedAtAction(nameof(GetById),
-            new { id = created.Id }, MapToDTO(created));
+        var created = await _postagemService.CreateAsync(postagem);
+        if (created is null) return BadRequest();
+
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, MapToDTO(created));
     }
 
     // PUT api/postagens/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] Postagem postagem)
+    public async Task<IActionResult> Update(long id, [FromBody] PostagemRequestDTO dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        postagem.Id = id;
+        var postagem = new Postagem
+        {
+            Id      = id,
+            Titulo  = dto.Titulo,
+            Texto   = dto.Texto,
+            Tema    = dto.TemaId.HasValue
+                        ? await _temaService.GetByIdAsync(dto.TemaId.Value)
+                        : null,
+            Usuario = dto.UsuarioId.HasValue
+                        ? await _usuarioService.GetByIdAsync(dto.UsuarioId.Value)
+                        : null
+        };
 
         var updated = await _postagemService.UpdateAsync(postagem);
         if (updated is null) return NotFound();
+
         return Ok(MapToDTO(updated));
     }
 

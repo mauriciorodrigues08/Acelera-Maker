@@ -67,6 +67,18 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// MIDDLEWARE GLOBAL DE EXCEÇÕES
+app.UseExceptionHandler(appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(
+            new { erro = "Erro interno do servidor." });
+    });
+});
+
 // PIPELINE HTTP
 if (app.Environment.IsDevelopment())
 {
@@ -87,3 +99,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program {}

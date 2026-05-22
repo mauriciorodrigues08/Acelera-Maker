@@ -46,10 +46,12 @@ namespace BlogPessoal.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Texto")
+                        .IsRequired()
                         .HasMaxLength(10000)
                         .HasColumnType("varchar(10000)");
 
                     b.Property<string>("Titulo")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
@@ -74,8 +76,8 @@ namespace BlogPessoal.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Descricao")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -91,19 +93,19 @@ namespace BlogPessoal.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Foto")
                         .HasColumnType("varchar(5000)");
 
                     b.Property<string>("Nome")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Senha")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 

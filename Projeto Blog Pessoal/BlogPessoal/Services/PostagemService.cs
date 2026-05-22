@@ -3,6 +3,7 @@
 
 using BlogPessoal.Models;
 using BlogPessoal.Repositories;
+using BlogPessoal.Services.IA;
 
 namespace BlogPessoal.Services;
 
@@ -12,15 +13,18 @@ public class PostagemService : IPostagemService
     private readonly IPostagemRepository _postagemRepository;
     private readonly ITemaRepository _temaRepository;
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IIAService _iaService;
 
     public PostagemService(
         IPostagemRepository postagemRepository,
         ITemaRepository temaRepository,
-        IUsuarioRepository usuarioRepository)
+        IUsuarioRepository usuarioRepository,
+        IIAService iaService)
     {
         _postagemRepository = postagemRepository;
         _temaRepository = temaRepository;
         _usuarioRepository = usuarioRepository;
+        _iaService = iaService; 
     }
 
     // Delega a busca de todas as postagens ao repositório
@@ -69,6 +73,12 @@ public class PostagemService : IPostagemService
 
         // Define a data de criação como o momento atual
         postagem.Data = DateTime.UtcNow;
+
+        // chama a IA para gerar resumo, tags e categoria
+        var resultadoIA = await _iaService.GerarResumoAsync(postagem.Texto!);
+        postagem.ResumoIA   = resultadoIA.Resumo;
+        postagem.TagsIA     = resultadoIA.Tags;
+        postagem.CategoriaIA = resultadoIA.Categoria;
 
         return await _postagemRepository.CreateAsync(postagem);
     }

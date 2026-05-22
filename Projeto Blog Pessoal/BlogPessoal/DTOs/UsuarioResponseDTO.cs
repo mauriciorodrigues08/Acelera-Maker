@@ -1,3 +1,5 @@
+namespace BlogPessoal.DTOs;
+
 public class UsuarioResponseDTO
 {
     public long Id { get; set; }

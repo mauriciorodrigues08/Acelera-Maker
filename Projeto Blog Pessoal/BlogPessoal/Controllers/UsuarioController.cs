@@ -8,6 +8,7 @@ using BlogPessoal.Models;
 using BlogPessoal.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BlogPessoal.Controllers;
 
@@ -63,42 +64,47 @@ public class UsuarioController : ControllerBase
     // Cadastra um novo usuário (endpoint público)
     [HttpPost("cadastrar")]
     [AllowAnonymous]
-    public async Task<IActionResult> Create([FromBody] Usuario usuario)
+    public async Task<IActionResult> Create([FromBody] UsuarioRequestDTO dto)
     {
-        // retorna 400 se os dados enviados não passarem nas validações do modelo
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        // tenta criar o usuário
-        var created = await _usuarioService.CreateAsync(usuario);
+        var usuario = new Usuario
+        {
+            Nome  = dto.Nome,
+            Email = dto.Email,
+            Senha = dto.Senha,
+            Foto  = dto.Foto
+        };
 
-        // retorna 409 se o email já estiver em uso
+        var created = await _usuarioService.CreateAsync(usuario);
         if (created is null) return Conflict("Email já cadastrado.");
 
-        // converte para DTO antes de retornar
-        return CreatedAtAction(
-                            nameof(GetById),
-                            new { id = created.Id },
-                            MapToDTO(created));
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, MapToDTO(created));
     }
 
     // PUT api/usuarios/{id}
     // Atualiza os dados de um usuário existente
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] Usuario usuario)
+    public async Task<IActionResult> Update(long id, [FromBody] UsuarioRequestDTO dto)
     {
-        // retorna 400 se os dados enviados não passarem nas validações do modelo
+        // verifica se o usuário autenticado é o dono do recurso
+        var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+        if (userId != id) return Forbid();
+
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        // garante que o ID da rota é o mesmo do corpo da requisição
-        usuario.Id = id;
+        var usuario = new Usuario
+        {
+            Id    = id,      // ID vem da rota, não do body
+            Nome  = dto.Nome,
+            Email = dto.Email,
+            Senha = dto.Senha,
+            Foto  = dto.Foto
+        };
 
-        // tenta atualizar o usuário
         var updated = await _usuarioService.UpdateAsync(usuario);
-
-        // retorna 404 caso o usuário não for encontrado
         if (updated is null) return NotFound();
 
-        // converte para DTO antes de retornar
         return Ok(MapToDTO(updated));
     }
 
@@ -107,13 +113,13 @@ public class UsuarioController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id)
     {
-        // tenta deletar o usuário
-        var deleted = await _usuarioService.DeleteAsync(id);
+        // verifica se o usuário autenticado é o dono do recurso
+        var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+        if (userId != id) return Forbid();
 
-        // retorna 404 caso o usuário não for encontrado
+        var deleted = await _usuarioService.DeleteAsync(id);
         if (!deleted) return NotFound();
 
-        // retorna 204 se for excluído com sucesso
         return NoContent();
     }
 

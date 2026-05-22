@@ -20,17 +20,15 @@ public class Postagem
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
 
-    // titulo da postagem
-    [Column(TypeName = "varchar(255)")]
-    [StringLength(255, MinimumLength = 3,
-        ErrorMessage = "O Título deve ter entre 3 e 255 caracteres.")]
-    public string? Titulo { get; set; }
+    // título da postagem
+    [Required(ErrorMessage = "O Título é obrigatório.")]
+    [StringLength(255, MinimumLength = 3, ErrorMessage = "...")]
+    public string Titulo { get; set; } = string.Empty;
 
     // texto da postagem
-    [Column(TypeName = "varchar(10000)")]
-    [StringLength(10000, MinimumLength = 10,
-        ErrorMessage = "O Texto deve ter entre 10 e 10000 caracteres.")]
-    public string? Texto { get; set; }
+    [Required(ErrorMessage = "O Texto é obrigatório.")]
+    [StringLength(10000, MinimumLength = 10, ErrorMessage = "...")]
+    public string Texto { get; set; } = string.Empty;
 
     // data da postagem (preenchida automaticamente)
     public DateTime? Data { get; set; } = DateTime.Now;

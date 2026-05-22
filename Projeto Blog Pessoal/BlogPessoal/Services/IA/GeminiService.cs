@@ -12,7 +12,6 @@ public class GeminiService : IIAService
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
 
-    // Injeta o HttpClient e lê a chave da API das configurações
     public GeminiService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
@@ -22,7 +21,7 @@ public class GeminiService : IIAService
     public async Task<ResultadoIA> GerarResumoAsync(string conteudo)
     {
         var prompt = PromptBuilder.BuildResumoPrompt(conteudo);
-    
+
         var requestBody = new
         {
             contents = new[]
@@ -30,14 +29,14 @@ public class GeminiService : IIAService
                 new { parts = new[] { new { text = prompt } } }
             }
         };
-    
+
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-    
+
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={_apiKey}";
         var response = await _httpClient.PostAsync(url, content);
-    
-        // trata erros da API de IA sem derrubar a aplicação
+
+        // trata erros de status HTTP sem derrubar a aplicação
         if (!response.IsSuccessStatusCode)
         {
             return new ResultadoIA
@@ -47,28 +46,50 @@ public class GeminiService : IIAService
                 Categoria = "Geral"
             };
         }
-    
+
         var responseBody = await response.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(responseBody);
-    
-        var text = doc.RootElement
-            .GetProperty("candidates")[0]
-            .GetProperty("content")
-            .GetProperty("parts")[0]
-            .GetProperty("text")
-            .GetString()!;
-    
-        text = text.Trim().TrimStart('`').TrimEnd('`');
-        if (text.StartsWith("json")) text = text[4..].Trim();
-    
-        var resultado = JsonSerializer.Deserialize<ResultadoIA>(text,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-    
-        return resultado ?? new ResultadoIA
+
+        try
         {
-            Resumo = "Não foi possível gerar o resumo.",
-            Tags = "",
-            Categoria = "Geral"
-        };
+            using var doc = JsonDocument.Parse(responseBody);
+
+            var text = doc.RootElement
+                .GetProperty("candidates")[0]
+                .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text")
+                .GetString()!;
+
+            text = text.Trim().TrimStart('`').TrimEnd('`');
+            if (text.StartsWith("json")) text = text[4..].Trim();
+
+            var resultado = JsonSerializer.Deserialize<ResultadoIA>(text,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return resultado ?? new ResultadoIA
+            {
+                Resumo = "Não foi possível gerar o resumo.",
+                Tags = "",
+                Categoria = "Geral"
+            };
+        }
+        catch (JsonException)
+        {
+            return new ResultadoIA
+            {
+                Resumo = "Resposta inválida da IA.",
+                Tags = "",
+                Categoria = "Geral"
+            };
+        }
+        catch (InvalidOperationException)
+        {
+            return new ResultadoIA
+            {
+                Resumo = "Estrutura de resposta da IA inesperada.",
+                Tags = "",
+                Categoria = "Geral"
+            };
+        }
     }
 }

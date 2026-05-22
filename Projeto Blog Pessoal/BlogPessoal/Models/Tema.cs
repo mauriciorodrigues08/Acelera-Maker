@@ -19,11 +19,12 @@ public class Tema
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // gera id automatico com autoincrement
     public long Id { get; set; }
 
-    [Column(TypeName = "varchar(255)")] // define o tipo da coluna no banco
-    [StringLength(255, MinimumLength = 3, 
-        ErrorMessage = "A Descrição deve ter entre 3 e 255 caracteres.")] // valida o tamanho da entrada na api
-    public string? Descricao { get; set; }
+    // descrição do tema
+    [Required(ErrorMessage = "A Descrição é obrigatória.")]
+    public string Descricao { get; set; } = string.Empty;
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] // evita loop infinito na serialização JSON quando Tema tentar trazer todas as Postagens
+    // postagem do tema
+    // evita loop infinito na serialização JSON quando Tema tentar trazer todas as Postagens
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] 
     public virtual ICollection<Postagem>? Postagem { get; set; } // representa o relacionamento 1:N com Postagem
 }

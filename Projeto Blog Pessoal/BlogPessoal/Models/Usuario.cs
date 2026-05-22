@@ -22,22 +22,17 @@ public class Usuario
     public long Id { get; set; }
 
     // nome
-    [Column(TypeName = "varchar(255)")]
-    [StringLength(255, MinimumLength = 3,
-        ErrorMessage = "O Nome deve ter entre 3 e 255 caracteres.")]
-    public string? Nome { get; set; }
+    [Required(ErrorMessage = "O Nome é obrigatório.")]
+    public string Nome { get; set; } = string.Empty;
 
-    // email 
-    [Column(TypeName = "varchar(255)")]
-    [StringLength(255, MinimumLength = 5,
-        ErrorMessage = "O Email deve ter entre 5 e 255 caracteres.")]
-    public string? Email { get; set; }
+    // email
+    [Required(ErrorMessage = "O Email é obrigatório.")]
+    [EmailAddress(ErrorMessage = "Formato de email inválido.")]
+    public string Email { get; set; } = string.Empty;
 
-    // senha (hash da senha, e não string pura)
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [Column(TypeName = "varchar(255)")]
-    [StringLength(255, MinimumLength = 8, ErrorMessage = "A Senha deve ter no mínimo 8 caracteres.")]
-    public string? Senha { get; set; }
+    // senha
+    [Required(ErrorMessage = "A Senha é obrigatória.")]
+    public string Senha { get; set; } = string.Empty;
 
     // foto (url da foto)
     [Column(TypeName = "varchar(5000)")]
