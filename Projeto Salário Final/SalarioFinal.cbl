@@ -25,6 +25,9 @@
       * OPCAO PARA INTERAGIR COM O MENU
        01 WS-OPCAO                    PIC 9 VALUE 0.
 
+      * VARIAVEL DE 'RETORNO' DA VERIFICACAO
+       01 WS-VALIDACAO                PIC X VALUE 'S'.
+
       * VARIAVEIS FORMATADAS PARA EXIBICAO DO RESULTADO
        01 WS-RES-NOME                 PIC X(30).
        01 WS-RES-SALARIO-BASE         PIC Z(04)9.99.
@@ -43,11 +46,23 @@
                EVALUATE WS-OPCAO
       *            SE 1 REALIZA A OPERACAO
                    WHEN 1
+      *                RECEBE OS DADOS
                        PERFORM ENTRADA-DADOS
-      *                PERFORM VALIDA-DADOS
-                       PERFORM CALCULA-BONUS
-                       PERFORM CALCULA-SALARIO
-                       PERFORM EXIBE-RESULTADO
+
+      *                VALIDA OS DADOS PASSADOS
+                       PERFORM VALIDA-DADOS
+
+                       IF (WS-VALIDACAO = 'S')
+      *                    CALCULA O BONUS
+                           PERFORM CALCULA-BONUS
+      
+      *                    CALCULA O SALARIO
+                           PERFORM CALCULA-SALARIO
+      
+      *                    EXIBE O RESULTADO
+                           PERFORM EXIBE-RESULTADO
+                       END-IF
+
 
       *            SE 2, MOVE O VALOR 2 PARA A VARIAVEL 
                    WHEN 2
@@ -84,13 +99,30 @@
 
       *    RECEBE O TEMPO DE EMPRESA
            DISPLAY 'INFORME O TEMPO DE EMPRESA (EM MESES): ' 
-               WITH NO ADVANCING.
+           WITH NO ADVANCING.
            ACCEPT WS-TEMPO-DE-EMPRESA.
 
 
       * PARAGRAFO PARA VALIDAR OS DADOS
        VALIDA-DADOS.
-       
+      *    VALIDA O NOME
+           IF (WS-NOME = SPACES OR WS-NOME = LOW-VALUES)
+               DISPLAY 'ERRO! NOME INVÁLIDO INFORMADO!'
+               MOVE 'N' TO WS-VALIDACAO
+           END-IF.
+
+      *    VALIDA O SALARIO
+           IF (WS-SALARIO-BASE IS NOT NUMERIC OR WS-SALARIO-BASE<= 0)
+               DISPLAY 'ERRO! SALARIO INVALIDO INFORMADO!'
+               MOVE 'N' TO WS-VALIDACAO
+           END-IF.
+
+      *    VALIDA O TEMPO DE EMPRESA
+           IF (WS-TEMPO-DE-EMPRESA IS NOT NUMERIC OR 
+           WS-TEMPO-DE-EMPRESA<= 0)
+               DISPLAY 'ERRO! TEMPO INVALIDO INFORMADO!'
+               MOVE 'N' TO WS-VALIDACAO
+           END-IF.
 
       * PARAGRAFO PARA CALCULAR O BONUS
        CALCULA-BONUS.
