@@ -16,6 +16,12 @@
       *    TEMPO DE EMPRESA (EM MESES)
            05 WS-TEMPO-DE-EMPRESA     PIC 9(02).
 
+      * VALORES DE TAXA PARA BONUS
+       01 WS-TAXAS.
+           05 WS-TAXA-INICIAL         PIC V99 VALUE .05.
+           05 WS-TAXA-INTERMEDIARIA   PIC V99 VALUE .10.
+           05 WS-TAXA-AVANCADA        PIC V99 VALUE .15.
+
       * BONUS
        01 WS-BONUS                    PIC 9(05)V99.
 
@@ -46,6 +52,9 @@
                EVALUATE WS-OPCAO
       *            SE 1 REALIZA A OPERACAO
                    WHEN 1
+      *                REINICIALIZA A VALIDACAO
+                       MOVE 'S' TO WS-VALIDACAO
+
       *                RECEBE OS DADOS
                        PERFORM ENTRADA-DADOS
 
@@ -67,7 +76,6 @@
       *            SE 2, MOVE O VALOR 2 PARA A VARIAVEL 
                    WHEN 2
                        DISPLAY 'PROGRAMA FINALIZADO!'
-                       MOVE 2 TO WS-OPCAO
 
       *            SE OUTRO, NOTIFICA ERRO
                    WHEN OTHER
@@ -126,21 +134,24 @@
 
       * PARAGRAFO PARA CALCULAR O BONUS
        CALCULA-BONUS.
-      *    1 ANO OU MENOS DE EMPRESA
-           IF (WS-TEMPO-DE-EMPRESA <= 12)
-               COMPUTE WS-BONUS = WS-SALARIO-BASE * 0.05
-           
-           ELSE
-      *        1 A 5 ANOS DE EMPRESA
-               IF (WS-TEMPO-DE-EMPRESA <= 60)
-                   COMPUTE WS-BONUS = WS-SALARIO-BASE * 0.1
-               
-               ELSE
-      *            ACIMA DE 5 ANOS
-                   COMPUTE WS-BONUS = WS-SALARIO-BASE * 0.15
-               
-               END-IF
-           END-IF.
+      *    VERIFICA O TEMPO DE EMPRESE E CALCULA O BONUS
+           EVALUATE TRUE
+      *        ATE 1 ANO DE EMPRESA
+               WHEN WS-TEMPO-DE-EMPRESA <= 12
+                   COMPUTE WS-BONUS = 
+                       WS-SALARIO-BASE * WS-TAXA-INICIAL
+
+      *        1 A 5 ANOS
+               WHEN WS-TEMPO-DE-EMPRESA <= 60
+                   COMPUTE WS-BONUS = 
+                       WS-SALARIO-BASE * WS-TAXA-INTERMEDIARIA
+
+      *        MAIS DE 5 ANOS
+               WHEN OTHER
+                   COMPUTE WS-BONUS = 
+                       WS-SALARIO-BASE * WS-TAXA-AVANCADA
+
+           END-EVALUATE.
 
       * PARAGRAFO PARA CALCULAR O NOVO SALARIO
        CALCULA-SALARIO.
