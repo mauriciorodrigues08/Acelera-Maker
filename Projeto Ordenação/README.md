@@ -6,7 +6,7 @@ A aplicação simula a rotina de um banco, lendo arquivos de clientes, ordenando
 
 ---
 
-## 🚀 Funcionalidades e Desafios Extras Concluídos
+## Funcionalidades e Desafios Extras Concluídos
 
 Todos os requisitos obrigatórios foram implementados, além do cumprimento com sucesso de todos os desafios extras propostos para a semana:
 
@@ -19,7 +19,7 @@ Todos os requisitos obrigatórios foram implementados, além do cumprimento com 
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 *   **Linguagem:** COBOL (Compilador IKFCBL00)
 *   **Controle de Job:** JCL (Job Control Language)
@@ -28,7 +28,7 @@ Todos os requisitos obrigatórios foram implementados, além do cumprimento com 
 
 ---
 
-## 📂 Estrutura de Arquivos
+## Estrutura de Arquivos
 
 Abaixo está o mapeamento dos Data Sets (arquivos) criados no Mainframe:
 
@@ -44,7 +44,7 @@ Abaixo está o mapeamento dos Data Sets (arquivos) criados no Mainframe:
 
 ---
 
-## 📸 Execução do Projeto
+## Execução do Projeto
 
 Abaixo estão as imagend da execução com sucesso do programa no ambiente TSO, incluindo a compilação, o retorno dos Jobs e o relatório gerado.
 
@@ -66,6 +66,6 @@ Abaixo estão as imagend da execução com sucesso do programa no ambiente TSO, 
 
 ---
 
-## 👤 Autor
+## Autor
 
 *   **Maurício de Oliveira Santos Rodrigues**
