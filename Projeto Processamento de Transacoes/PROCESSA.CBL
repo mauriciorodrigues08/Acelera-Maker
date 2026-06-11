@@ -1,0 +1,283 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROCESSA.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT ARQ-CLIENTES
+               ASSIGN TO 'CLIENTES.TXT'
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+           SELECT ARQ-TRANSACOES
+               ASSIGN TO 'TRANSACOES.TXT'
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+           SELECT ARQ-ERROS
+               ASSIGN TO 'ERROS.TXT'
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+           SELECT ARQ-SAIDA
+               ASSIGN TO "SAIDA.TXT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+           SELECT ARQ-RELATORIO
+               ASSIGN TO 'RELATORIO.TXT'
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD ARQ-CLIENTES.
+           01 REG-CLIENTE.
+               05 CLI-ID             PIC 9(05).
+               05 CLI-NOME           PIC X(30).
+               05 CLI-SALDO          PIC 9(09).
+
+       FD ARQ-TRANSACOES.
+           01 REG-TRANSACAO.
+               05 TRANS-CLI-ID       PIC 9(05).
+               05 TRX-ID             PIC 9(05).
+               05 TRX-TIPO           PIC X(01).
+               05 TRX-VALOR          PIC 9(09).
+
+       FD ARQ-SAIDA.
+           01 REG-SAIDA.
+               05 SAIDA-CLI-ID       PIC 9(05).
+               05 SAIDA-CLI-NOME     PIC X(30).
+               05 SAIDA-CLI-SALDO    PIC 9(09).
+
+       FD ARQ-RELATORIO.
+           01 REG-RELATORIO          PIC X(80).
+
+       FD ARQ-ERROS.
+           01 REG-ERRO               PIC X(80).
+
+       WORKING-STORAGE SECTION.
+           01 WS-RELATORIO.
+               05 WS-CLIENTE         PIC 9(05).
+               05 WS-TOTAL-CREDITOS  PIC 9(09) VALUE ZEROS.
+               05 WS-TOTAL-DEBITOS   PIC 9(09) VALUE ZEROS.
+
+           01 WS-ESTATISTICAS-PROCESSAMENTO.
+               05 QTD-CLIENTES       PIC 9(06) VALUE ZEROS.
+               05 QTD-TRANSACOES     PIC 9(06) VALUE ZEROS.
+               05 QTD-CREDITOS       PIC 9(06) VALUE ZEROS.
+               05 QTD-DEBITOS        PIC 9(06) VALUE ZEROS.
+               05 QTD-ERROS          PIC 9(06) VALUE ZEROS.
+
+           01 WS-SALDO-TRABALHO      PIC 9(09) VALUE ZEROS.
+
+           01 WS-LINHA-ERRO          PIC X(80).
+           01 WS-LINHA-RELATORIO     PIC X(80).
+
+           01 WS-FLAGS.
+               05 WS-FIM-CLIENTES    PIC X(01) VALUE 'N'.
+               05 WS-FIM-TRANSACOES  PIC X(01) VALUE 'N'.
+
+       PROCEDURE DIVISION.
+      * MAIN - COORDENA A EXECUCAO GERAL DO PROGRAMA
+       0000-MAIN.
+           PERFORM 0001-INICIAR
+           PERFORM 0002-PROCESSAR
+           PERFORM 0003-FINALIZAR
+           PERFORM 0004-EXIBIR-ESTATISTICAS
+           STOP RUN.
+
+      * ABRE TODOS OS ARQUIVOS
+       0001-INICIAR.
+           OPEN INPUT  ARQ-CLIENTES
+           OPEN INPUT  ARQ-TRANSACOES
+           OPEN OUTPUT ARQ-ERROS
+           OPEN OUTPUT ARQ-RELATORIO
+           OPEN OUTPUT ARQ-SAIDA
+           PERFORM 1000-LER-CLIENTES
+           PERFORM 2000-LER-TRANSACOES.
+
+      * EXECUTA ATE AMBOS OS ARQUIVOS ACABAREM
+       0002-PROCESSAR.
+           PERFORM UNTIL WS-FIM-CLIENTES = 'S'
+             AND WS-FIM-TRANSACOES = 'S'
+               PERFORM 3000-COMPARAR-IDS
+           END-PERFORM.
+
+      * FECHA TODOS OS ARQUIVOS
+       0003-FINALIZAR.
+           CLOSE ARQ-CLIENTES
+           CLOSE ARQ-TRANSACOES
+           CLOSE ARQ-SAIDA
+           CLOSE ARQ-RELATORIO
+           CLOSE ARQ-ERROS.
+
+      * EXIBE ESTATISTICAS FINAIS
+       0004-EXIBIR-ESTATISTICAS.
+           DISPLAY '*****************************************'
+           DISPLAY '      ESTATISTICAS DE PROCESSAMENTO      '
+           DISPLAY '*****************************************'
+           DISPLAY '..CLIENTES PROCESSADOS: ' QTD-CLIENTES
+           DISPLAY 'TRANSACOES PROCESSADAS: ' QTD-TRANSACOES
+           DISPLAY '..CREDITOS PROCESSADOS: ' QTD-CREDITOS
+           DISPLAY '...DEBITOS PROCESSADOS: ' QTD-DEBITOS
+           DISPLAY '.....ERROS ENCONTRADOS: ' QTD-ERROS
+           DISPLAY '********** FIM DO PROCESSAMENTO *********'.
+
+      * LE UM REGISTRO DE CLIENTES
+       1000-LER-CLIENTES.
+           READ ARQ-CLIENTES
+               AT END MOVE 'S' TO WS-FIM-CLIENTES
+           END-READ.
+
+      * LE UM REGISTRO DE TRANSACOES
+       2000-LER-TRANSACOES.
+           READ ARQ-TRANSACOES
+               AT END MOVE 'S' TO WS-FIM-TRANSACOES
+           END-READ.
+
+      * VALIDA TIPO E VALOR DA TRANSACAO ATUAL
+      * RETORNA WS-FIM-TRANSACOES = 'E' SE TRANSACAO INVALIDA
+       2100-VERIFICA-TRANSACAO.
+           IF TRX-TIPO NOT = 'C' AND TRX-TIPO NOT = 'D'
+               MOVE SPACES TO WS-LINHA-ERRO
+               STRING 'ERRO: TIPO DE TRANSACAO INVALIDO - ID '
+                   DELIMITED SIZE
+                   TRANS-CLI-ID DELIMITED SIZE
+                   INTO WS-LINHA-ERRO
+               PERFORM 5200-GRAVAR-ERRO
+               ADD 1 TO QTD-ERROS
+               PERFORM 2000-LER-TRANSACOES
+               GO TO 2100-VERIFICA-TRANSACAO
+           END-IF
+
+           IF TRX-VALOR = ZEROS
+               MOVE SPACES TO WS-LINHA-ERRO
+               STRING 'ERRO: VALOR DE TRANSACAO INVALIDO - ID '
+                   DELIMITED SIZE
+                   TRANS-CLI-ID DELIMITED SIZE
+                   INTO WS-LINHA-ERRO
+               PERFORM 5200-GRAVAR-ERRO
+               ADD 1 TO QTD-ERROS
+               PERFORM 2000-LER-TRANSACOES
+               GO TO 2100-VERIFICA-TRANSACAO
+           END-IF.
+
+      * MATCH/MERGE: COMPARA IDS E DECIDE O QUE FAZER
+       3000-COMPARAR-IDS.
+           EVALUATE TRUE
+
+      *        AMBOS ESGOTADOS
+               WHEN WS-FIM-CLIENTES = 'S'
+               AND  WS-FIM-TRANSACOES = 'S'
+                   CONTINUE
+
+      *        SEM MAIS TRANSACOES: GRAVA CLIENTES RESTANTES
+               WHEN WS-FIM-TRANSACOES = 'S'
+                   PERFORM 5100-GRAVAR-CLIENTE
+                   PERFORM 1000-LER-CLIENTES
+
+      *        SEM MAIS CLIENTES: TRANSACOES ORFAS VIRAM ERRO
+               WHEN WS-FIM-CLIENTES = 'S'
+                   MOVE SPACES TO WS-LINHA-ERRO
+                   STRING 'ERRO: CLIENTE NAO ENCONTRADO - ID '
+                       DELIMITED SIZE
+                       TRANS-CLI-ID DELIMITED SIZE
+                       INTO WS-LINHA-ERRO
+                   PERFORM 5200-GRAVAR-ERRO
+                   ADD 1 TO QTD-ERROS
+                   PERFORM 2000-LER-TRANSACOES
+
+      *        IDS IGUAIS: VALIDA E PROCESSA TRANSACAO
+               WHEN CLI-ID = TRANS-CLI-ID
+                   PERFORM 2100-VERIFICA-TRANSACAO
+                   IF WS-FIM-TRANSACOES = 'N'
+                       PERFORM 4000-PROCESSAR-TRANSACAO
+                   END-IF
+
+      *        CLIENTE MENOR: GRAVA CLIENTE SEM TRANSACAO E AVANCA
+               WHEN CLI-ID < TRANS-CLI-ID
+                   PERFORM 5100-GRAVAR-CLIENTE
+                   PERFORM 1000-LER-CLIENTES
+
+      *        TRANSACAO MENOR: CLIENTE NAO EXISTE
+               WHEN CLI-ID > TRANS-CLI-ID
+                   MOVE SPACES TO WS-LINHA-ERRO
+                   STRING 'ERRO: CLIENTE NAO ENCONTRADO - ID '
+                       DELIMITED SIZE
+                       TRANS-CLI-ID DELIMITED SIZE
+                       INTO WS-LINHA-ERRO
+                   PERFORM 5200-GRAVAR-ERRO
+                   ADD 1 TO QTD-ERROS
+                   PERFORM 2000-LER-TRANSACOES
+
+           END-EVALUATE.
+
+      * APLICA CREDITO OU DEBITO NO SALDO DO CLIENTE
+       4000-PROCESSAR-TRANSACAO.
+           ADD 1 TO QTD-TRANSACOES
+
+           IF TRX-TIPO = 'C'
+               ADD TRX-VALOR TO CLI-SALDO
+               ADD TRX-VALOR TO WS-TOTAL-CREDITOS
+               ADD 1 TO QTD-CREDITOS
+           ELSE
+               IF TRX-VALOR > CLI-SALDO
+                   MOVE SPACES TO WS-LINHA-ERRO
+                   STRING 'ERRO: SALDO INSUFICIENTE - ID '
+                       DELIMITED SIZE
+                       CLI-ID DELIMITED SIZE
+                       INTO WS-LINHA-ERRO
+                   PERFORM 5200-GRAVAR-ERRO
+                   ADD 1 TO QTD-ERROS
+               ELSE
+                   SUBTRACT TRX-VALOR FROM CLI-SALDO
+                   ADD TRX-VALOR TO WS-TOTAL-DEBITOS
+                   ADD 1 TO QTD-DEBITOS
+               END-IF
+           END-IF
+
+           PERFORM 2000-LER-TRANSACOES
+
+           IF WS-FIM-TRANSACOES = 'S' OR
+              TRANS-CLI-ID NOT = CLI-ID
+               PERFORM 5100-GRAVAR-CLIENTE
+               PERFORM 1000-LER-CLIENTES
+           END-IF.
+
+      * GRAVA CLIENTE COM SALDO ATUALIZADO E ACIONA RELATORIO
+       5100-GRAVAR-CLIENTE.
+           MOVE CLI-ID    TO SAIDA-CLI-ID
+           MOVE CLI-NOME  TO SAIDA-CLI-NOME
+           MOVE CLI-SALDO TO SAIDA-CLI-SALDO
+           WRITE REG-SAIDA
+
+           PERFORM 5300-GRAVAR-RELATORIO
+
+           ADD 1 TO QTD-CLIENTES
+
+           MOVE ZEROS TO WS-TOTAL-CREDITOS
+           MOVE ZEROS TO WS-TOTAL-DEBITOS.
+
+      * GRAVA MENSAGEM DE ERRO NO ARQUIVO DE ERROS
+       5200-GRAVAR-ERRO.
+           MOVE WS-LINHA-ERRO TO REG-ERRO
+           WRITE REG-ERRO.
+
+      * GRAVA LINHAS DO RELATORIO PARA O CLIENTE ATUAL
+       5300-GRAVAR-RELATORIO.
+           MOVE SPACES TO WS-LINHA-RELATORIO
+           STRING 'CLIENTE: '   DELIMITED SIZE
+                  CLI-ID        DELIMITED SIZE
+               INTO WS-LINHA-RELATORIO
+           MOVE WS-LINHA-RELATORIO TO REG-RELATORIO
+           WRITE REG-RELATORIO
+
+           MOVE SPACES TO WS-LINHA-RELATORIO
+           STRING 'TOTAL CREDITOS: ' DELIMITED SIZE
+                  WS-TOTAL-CREDITOS  DELIMITED SIZE
+               INTO WS-LINHA-RELATORIO
+           MOVE WS-LINHA-RELATORIO TO REG-RELATORIO
+           WRITE REG-RELATORIO
+
+           MOVE SPACES TO WS-LINHA-RELATORIO
+           STRING 'TOTAL DEBITOS:  ' DELIMITED SIZE
+                  WS-TOTAL-DEBITOS   DELIMITED SIZE
+               INTO WS-LINHA-RELATORIO
+           MOVE WS-LINHA-RELATORIO TO REG-RELATORIO
+           WRITE REG-RELATORIO.
