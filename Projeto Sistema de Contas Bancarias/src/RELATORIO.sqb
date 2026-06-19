@@ -1,0 +1,300 @@
+      **************************************************************
+      * PROGRAMA: RELATORIO
+      * DESCRICAO: CONSULTA O DB2 DIRETAMENTE E GERA:
+      *   - RELATORIO DE PROCESSAMENTO (TOTAIS GERAIS)
+      *   - RELATORIO DETALHADO (CLIENTE + TRANSACOES + STATUS)
+      *   GRAVA AMBOS EM RELATORIO.TXT E TAMBEM EXIBE NO TERMINAL.
+      **************************************************************
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. RELATORIO.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT F-RELATORIO
+               ASSIGN TO "RELATORIO.TXT"
+               ORGANIZATION IS LINE SEQUENTIAL
+               FILE STATUS IS WS-FS-RELATORIO.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  F-RELATORIO.
+       01  REG-RELATORIO               PIC X(100).
+
+       WORKING-STORAGE SECTION.
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+
+      *--- AREA DE COMUNICACAO COM O DB2 (HOST VARIABLES) -----------
+           EXEC SQL BEGIN DECLARE SECTION END-EXEC.
+       01  WS-HV-CLI-ID                PIC S9(05) COMP-3.
+       01  WS-HV-CLI-NOME              PIC X(30).
+       01  WS-HV-CLI-SALDO             PIC S9(09) COMP-3.
+       01  WS-HV-TRX-ID                PIC S9(05) COMP-3.
+       01  WS-HV-TRX-TIPO              PIC X(01).
+       01  WS-HV-TRX-VALOR             PIC S9(09) COMP-3.
+       01  WS-HV-TOT-CLIENTES          PIC S9(09) COMP-3.
+       01  WS-HV-TOT-TRANSACOES        PIC S9(09) COMP-3.
+       01  WS-HV-TOT-CREDITOS          PIC S9(09) COMP-3.
+       01  WS-HV-TOT-DEBITOS           PIC S9(09) COMP-3.
+       01  WS-HV-TOT-ERROS             PIC S9(09) COMP-3.
+           EXEC SQL END DECLARE SECTION END-EXEC.
+
+      *--- DECLARACAO DO CURSOR DE CLIENTES --------------------------
+           EXEC SQL
+               DECLARE CUR-CLIENTES CURSOR FOR
+                   SELECT CLI_ID, CLI_NOME, CLI_SALDO
+                   FROM CLIENTES
+                   ORDER BY CLI_ID
+           END-EXEC.
+
+      *--- DECLARACAO DO CURSOR DE TRANSACOES POR CLIENTE ------------
+           EXEC SQL
+               DECLARE CUR-TRX CURSOR FOR
+                   SELECT TRX_ID, TRX_TIPO, TRX_VALOR
+                   FROM TRANSACOES
+                   WHERE CLI_ID = :WS-HV-CLI-ID
+                   ORDER BY TRX_ID
+           END-EXEC.
+
+      *--- FLAGS E STATUS DE ARQUIVO ---------------------------------
+       01  WS-FS-RELATORIO             PIC XX.
+       01  WS-FIM-CLIENTES             PIC X       VALUE 'N'.
+           88 FIM-DOS-CLIENTES                     VALUE 'S'.
+       01  WS-FIM-TRX                  PIC X       VALUE 'N'.
+           88 FIM-DAS-TRX                          VALUE 'S'.
+
+      *--- AUXILIARES DE EDICAO / EXIBICAO ----------------------------
+       01  WS-LINHA                    PIC X(100).
+       01  WS-TIPO-DESC                PIC X(08).
+
+      *--- CAMPOS DE EDICAO (EXIBICAO SEM SINAL) -----------------------
+       01  WS-ED-CLI-ID                PIC ZZZZ9.
+       01  WS-ED-CLI-SALDO             PIC ZZZZZZZZ9.
+       01  WS-ED-TRX-ID                PIC ZZZZ9.
+       01  WS-ED-TRX-VALOR             PIC ZZZZZZZZ9.
+       01  WS-ED-TOT-CLIENTES          PIC ZZZZZ9.
+       01  WS-ED-TOT-TRANSACOES        PIC ZZZZZ9.
+       01  WS-ED-TOT-CREDITOS          PIC ZZZZZ9.
+       01  WS-ED-TOT-DEBITOS           PIC ZZZZZ9.
+       01  WS-ED-TOT-ERROS             PIC ZZZZZ9.
+
+       PROCEDURE DIVISION.
+
+       0000-PRINCIPAL.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-RELATORIO-PROCESSAMENTO
+           PERFORM 3000-RELATORIO-DETALHADO
+           PERFORM 9000-FINALIZAR
+           STOP RUN.
+
+      **************************************************************
+       1000-INICIALIZAR.
+           EXEC SQL CONNECT TO BANCODB END-EXEC.
+           IF SQLCODE NOT = 0
+               DISPLAY "ERRO AO CONECTAR NO BANCODB. SQLCODE: " SQLCODE
+               STOP RUN
+           END-IF.
+
+           OPEN OUTPUT F-RELATORIO.
+
+      **************************************************************
+       2000-RELATORIO-PROCESSAMENTO.
+           EXEC SQL
+               SELECT COUNT(*) INTO :WS-HV-TOT-CLIENTES
+               FROM CLIENTES
+           END-EXEC.
+
+           EXEC SQL
+               SELECT COUNT(*) INTO :WS-HV-TOT-TRANSACOES
+               FROM TRANSACOES
+           END-EXEC.
+
+           EXEC SQL
+               SELECT COUNT(*) INTO :WS-HV-TOT-CREDITOS
+               FROM TRANSACOES
+               WHERE TRX_TIPO = 'C'
+           END-EXEC.
+
+           EXEC SQL
+               SELECT COUNT(*) INTO :WS-HV-TOT-DEBITOS
+               FROM TRANSACOES
+               WHERE TRX_TIPO = 'D'
+           END-EXEC.
+
+           EXEC SQL
+               SELECT COUNT(*) INTO :WS-HV-TOT-ERROS
+               FROM ERROS_PROCESSAMENTO
+           END-EXEC.
+
+           PERFORM 2100-EXIBIR-E-GRAVAR-CABECALHO
+           PERFORM 2200-EXIBIR-E-GRAVAR-TOTAIS.
+
+      **************************************************************
+       2100-EXIBIR-E-GRAVAR-CABECALHO.
+           DISPLAY " ".
+           DISPLAY "***********************************************".
+           DISPLAY " RELATORIO DE PROCESSAMENTO".
+           DISPLAY "***********************************************".
+
+           MOVE "***********************************************"
+               TO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           MOVE " RELATORIO DE PROCESSAMENTO" TO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           MOVE "***********************************************"
+               TO REG-RELATORIO
+           WRITE REG-RELATORIO.
+
+      **************************************************************
+       2200-EXIBIR-E-GRAVAR-TOTAIS.
+           MOVE WS-HV-TOT-CLIENTES   TO WS-ED-TOT-CLIENTES.
+           MOVE WS-HV-TOT-TRANSACOES TO WS-ED-TOT-TRANSACOES.
+           MOVE WS-HV-TOT-CREDITOS   TO WS-ED-TOT-CREDITOS.
+           MOVE WS-HV-TOT-DEBITOS    TO WS-ED-TOT-DEBITOS.
+           MOVE WS-HV-TOT-ERROS      TO WS-ED-TOT-ERROS.
+
+           DISPLAY " CLIENTES CADASTRADOS....: " WS-ED-TOT-CLIENTES.
+           DISPLAY " TRANSACOES PROCESSADAS..: " WS-ED-TOT-TRANSACOES.
+           DISPLAY " CREDITOS PROCESSADOS....: " WS-ED-TOT-CREDITOS.
+           DISPLAY " DEBITOS PROCESSADOS.....: " WS-ED-TOT-DEBITOS.
+           DISPLAY " ERROS ENCONTRADOS.......: " WS-ED-TOT-ERROS.
+
+           STRING " CLIENTES CADASTRADOS....: " WS-ED-TOT-CLIENTES
+               DELIMITED BY SIZE INTO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           STRING " TRANSACOES PROCESSADAS..: " WS-ED-TOT-TRANSACOES
+               DELIMITED BY SIZE INTO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           STRING " CREDITOS PROCESSADOS....: " WS-ED-TOT-CREDITOS
+               DELIMITED BY SIZE INTO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           STRING " DEBITOS PROCESSADOS.....: " WS-ED-TOT-DEBITOS
+               DELIMITED BY SIZE INTO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           STRING " ERROS ENCONTRADOS.......: " WS-ED-TOT-ERROS
+               DELIMITED BY SIZE INTO REG-RELATORIO
+           WRITE REG-RELATORIO.
+
+      **************************************************************
+       3000-RELATORIO-DETALHADO.
+           DISPLAY " ".
+           DISPLAY "***********************************************".
+           DISPLAY " RELATORIO DETALHADO - CLIENTES E TRANSACOES".
+           DISPLAY "***********************************************".
+
+           MOVE " " TO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           MOVE "***********************************************"
+               TO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           MOVE " RELATORIO DETALHADO - CLIENTES E TRANSACOES"
+               TO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           MOVE "***********************************************"
+               TO REG-RELATORIO
+           WRITE REG-RELATORIO.
+
+           EXEC SQL OPEN CUR-CLIENTES END-EXEC.
+
+           MOVE 'N' TO WS-FIM-CLIENTES
+           PERFORM 3100-FETCH-CLIENTE
+
+           PERFORM 3200-PROCESSAR-CLIENTE UNTIL FIM-DOS-CLIENTES.
+
+           EXEC SQL CLOSE CUR-CLIENTES END-EXEC.
+
+      **************************************************************
+       3100-FETCH-CLIENTE.
+           EXEC SQL
+               FETCH CUR-CLIENTES
+               INTO :WS-HV-CLI-ID, :WS-HV-CLI-NOME, :WS-HV-CLI-SALDO
+           END-EXEC.
+
+           IF SQLCODE = 100
+               MOVE 'S' TO WS-FIM-CLIENTES
+           ELSE
+               IF SQLCODE NOT = 0
+                   DISPLAY "ERRO NO FETCH DE CLIENTES. SQLCODE: "
+                       SQLCODE
+                   MOVE 'S' TO WS-FIM-CLIENTES
+               END-IF
+           END-IF.
+
+      **************************************************************
+       3200-PROCESSAR-CLIENTE.
+           MOVE WS-HV-CLI-ID    TO WS-ED-CLI-ID.
+           MOVE WS-HV-CLI-SALDO TO WS-ED-CLI-SALDO.
+
+           DISPLAY " ".
+           DISPLAY "CLIENTE: " WS-ED-CLI-ID " - " WS-HV-CLI-NOME
+               " - SALDO ATUAL: " WS-ED-CLI-SALDO.
+
+           MOVE " " TO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           STRING "CLIENTE: " WS-ED-CLI-ID " - " WS-HV-CLI-NOME
+               DELIMITED BY SIZE INTO REG-RELATORIO
+           WRITE REG-RELATORIO.
+           STRING "SALDO ATUAL: " WS-ED-CLI-SALDO
+               DELIMITED BY SIZE INTO REG-RELATORIO
+           WRITE REG-RELATORIO.
+
+           PERFORM 3300-LISTAR-TRANSACOES-DO-CLIENTE
+
+           PERFORM 3100-FETCH-CLIENTE.
+
+      **************************************************************
+       3300-LISTAR-TRANSACOES-DO-CLIENTE.
+           EXEC SQL OPEN CUR-TRX END-EXEC.
+
+           MOVE 'N' TO WS-FIM-TRX
+           PERFORM 3400-FETCH-TRX
+
+           PERFORM 3500-EXIBIR-TRX UNTIL FIM-DAS-TRX.
+
+           EXEC SQL CLOSE CUR-TRX END-EXEC.
+
+      **************************************************************
+       3400-FETCH-TRX.
+           EXEC SQL
+               FETCH CUR-TRX
+               INTO :WS-HV-TRX-ID, :WS-HV-TRX-TIPO, :WS-HV-TRX-VALOR
+           END-EXEC.
+
+           IF SQLCODE = 100
+               MOVE 'S' TO WS-FIM-TRX
+           ELSE
+               IF SQLCODE NOT = 0
+                   DISPLAY "ERRO NO FETCH DE TRANSACOES. SQLCODE: "
+                       SQLCODE
+                   MOVE 'S' TO WS-FIM-TRX
+               END-IF
+           END-IF.
+
+      **************************************************************
+       3500-EXIBIR-TRX.
+           IF WS-HV-TRX-TIPO = 'C'
+               MOVE "CREDITO " TO WS-TIPO-DESC
+           ELSE
+               MOVE "DEBITO  " TO WS-TIPO-DESC
+           END-IF.
+
+           MOVE WS-HV-TRX-ID    TO WS-ED-TRX-ID.
+           MOVE WS-HV-TRX-VALOR TO WS-ED-TRX-VALOR.
+
+           DISPLAY "  TRX " WS-ED-TRX-ID " - " WS-TIPO-DESC
+               " - VALOR: " WS-ED-TRX-VALOR " - STATUS: APLICADA".
+
+           STRING "  TRX " WS-ED-TRX-ID " - " WS-TIPO-DESC
+               " - VALOR: " WS-ED-TRX-VALOR " - STATUS: APLICADA"
+               DELIMITED BY SIZE INTO REG-RELATORIO
+           WRITE REG-RELATORIO.
+
+           PERFORM 3400-FETCH-TRX.
+
+      **************************************************************
+       9000-FINALIZAR.
+           CLOSE F-RELATORIO.
+           EXEC SQL CONNECT RESET END-EXEC.
+
+           DISPLAY " ".
+           DISPLAY "FIM DO RELATORIO. ARQUIVO RELATORIO.TXT GERADO.".

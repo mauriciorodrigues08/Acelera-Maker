@@ -1,0 +1,260 @@
+      **************************************************************
+      * PROGRAMA: CLILOAD
+      * DESCRICAO: LE O ARQUIVO CLIENTES.TXT
+      *     CARREGA/ATUALIZA A
+      *            TABELA CLIENTES NO DB2.
+      * REGRAS:
+      *   - NOME OBRIGATORIO (NAO PODE SER BRANCO)
+      *   - SE CLIENTE NAO EXISTE -> INSERT
+      *   - SE CLIENTE JA EXISTE  -> UPDATE (NOME E SALDO)
+      *   - COMMIT A CADA 100 REGISTROS PROCESSADOS
+      *   - ROLLBACK EM CASO DE ERRO SQL
+      *   - ERROS GRAVADOS EM ERROS.TXT E NA TABELA ERROS_PROCESSAMENTO
+      **************************************************************
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CLILOAD.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT F-CLIENTES
+               ASSIGN TO "CLIENTES.TXT"
+               ORGANIZATION IS LINE SEQUENTIAL
+               FILE STATUS IS WS-FS-CLIENTES.
+
+           SELECT F-ERROS
+               ASSIGN TO "ERROS.TXT"
+               ORGANIZATION IS LINE SEQUENTIAL
+               FILE STATUS IS WS-FS-ERROS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  F-CLIENTES.
+           COPY CLIENTE.
+
+       FD  F-ERROS.
+       01  REG-ERRO                   PIC X(100).
+
+       WORKING-STORAGE SECTION.
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+
+      *--- AREA DE COMUNICACAO COM O DB2 (HOST VARIABLES) -------------
+           EXEC SQL BEGIN DECLARE SECTION END-EXEC.
+       01  WS-HV-CLI-ID                PIC S9(05) COMP-3.
+       01  WS-HV-CLI-NOME              PIC X(30).
+       01  WS-HV-CLI-SALDO             PIC S9(09) COMP-3.
+       01  WS-HV-CLI-NOME-EXIST        PIC X(30).
+       01  WS-HV-DESC-ERRO             PIC X(100).
+       01  WS-HV-CLI-ID-ERRO           PIC S9(05) COMP-3.
+           EXEC SQL END DECLARE SECTION END-EXEC.
+
+      *--- FLAGS E STATUS DE ARQUIVO -----------------------------------
+       01  WS-FS-CLIENTES              PIC XX.
+       01  WS-FS-ERROS                 PIC XX.
+       01  WS-FIM-ARQUIVO              PIC X       VALUE 'N'.
+           88 FIM-DO-ARQUIVO                       VALUE 'S'.
+
+      *--- CONTADORES / ESTATISTICAS -----------------------------------
+       01  WS-TOT-LIDOS                PIC 9(06)   VALUE ZERO.
+       01  WS-TOT-INSERIDOS            PIC 9(06)   VALUE ZERO.
+       01  WS-TOT-ATUALIZADOS          PIC 9(06)   VALUE ZERO.
+       01  WS-TOT-ERROS                PIC 9(06)   VALUE ZERO.
+       01  WS-CONT-COMMIT              PIC 9(06)   VALUE ZERO.
+
+      *--- AUXILIARES DE EXIBICAO / LOG --------------------------------
+       01  WS-LINHA-LOG                PIC X(100).
+       01  WS-CLI-ID-EDIT              PIC 9(05).
+
+       PROCEDURE DIVISION.
+
+       0000-PRINCIPAL.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR UNTIL FIM-DO-ARQUIVO
+           PERFORM 3000-FINALIZAR
+           STOP RUN.
+
+      **************************************************************
+       1000-INICIALIZAR.
+           DISPLAY " ".
+           DISPLAY "=================================================".
+           DISPLAY " INICIANDO CLILOAD - CARGA DE CLIENTES NO DB2".
+           DISPLAY "=================================================".
+
+           EXEC SQL CONNECT TO BANCODB END-EXEC.
+           IF SQLCODE NOT = 0
+               DISPLAY "ERRO AO CONECTAR NO BANCODB. SQLCODE: " SQLCODE
+               STOP RUN
+           END-IF.
+
+           OPEN INPUT F-CLIENTES.
+           IF WS-FS-CLIENTES NOT = "00"
+               DISPLAY "ERRO AO ABRIR CLIENTES.TXT. STATUS: "
+                   WS-FS-CLIENTES
+               STOP RUN
+           END-IF.
+
+           OPEN OUTPUT F-ERROS.
+
+           PERFORM 2100-LER-CLIENTE.
+
+      **************************************************************
+       2000-PROCESSAR.
+           ADD 1 TO WS-TOT-LIDOS
+
+           DISPLAY "--------------------------------------------------".
+           DISPLAY "PROCESSANDO CLIENTE: " CLI-ID " - "
+               CLI-NOME.
+
+           IF CLI-NOME = SPACES
+               PERFORM 2500-REGISTRAR-ERRO-NOME
+           ELSE
+               PERFORM 2200-VERIFICAR-CLIENTE
+           END-IF
+
+           PERFORM 2900-CONTROLAR-COMMIT
+           PERFORM 2100-LER-CLIENTE.
+
+      **************************************************************
+       2100-LER-CLIENTE.
+           READ F-CLIENTES
+               AT END
+                   MOVE 'S' TO WS-FIM-ARQUIVO
+           END-READ.
+
+           IF NOT FIM-DO-ARQUIVO
+               IF WS-FS-CLIENTES NOT = "00"
+                   DISPLAY "ERRO DE LEITURA. STATUS: " WS-FS-CLIENTES
+                   MOVE 'S' TO WS-FIM-ARQUIVO
+               END-IF
+           END-IF.
+
+      **************************************************************
+       2200-VERIFICAR-CLIENTE.
+           MOVE CLI-ID    TO WS-HV-CLI-ID.
+           MOVE CLI-NOME  TO WS-HV-CLI-NOME.
+           MOVE CLI-SALDO TO WS-HV-CLI-SALDO.
+
+           EXEC SQL
+               SELECT CLI_NOME INTO :WS-HV-CLI-NOME-EXIST
+               FROM CLIENTES
+               WHERE CLI_ID = :WS-HV-CLI-ID
+           END-EXEC.
+
+           EVALUATE SQLCODE
+               WHEN 0
+                   PERFORM 2300-ATUALIZAR-CLIENTE
+               WHEN 100
+                   PERFORM 2400-INSERIR-CLIENTE
+               WHEN OTHER
+                   PERFORM 2600-REGISTRAR-ERRO-SQL
+           END-EVALUATE.
+
+      **************************************************************
+       2300-ATUALIZAR-CLIENTE.
+           EXEC SQL
+               UPDATE CLIENTES
+                  SET CLI_NOME = :WS-HV-CLI-NOME,
+                      CLI_SALDO = :WS-HV-CLI-SALDO,
+                      DT_ATUALIZACAO = CURRENT DATE
+                WHERE CLI_ID = :WS-HV-CLI-ID
+           END-EXEC.
+
+           IF SQLCODE = 0
+               ADD 1 TO WS-TOT-ATUALIZADOS
+               DISPLAY "  STATUS: SUCESSO - CLIENTE ATUALIZADO"
+               MOVE "SUCESSO - ATUALIZADO" TO WS-LINHA-LOG
+           ELSE
+               PERFORM 2600-REGISTRAR-ERRO-SQL
+           END-IF.
+
+      **************************************************************
+       2400-INSERIR-CLIENTE.
+           EXEC SQL
+               INSERT INTO CLIENTES
+                   (CLI_ID, CLI_NOME, CLI_SALDO, DT_ATUALIZACAO)
+                   VALUES
+                   (:WS-HV-CLI-ID, :WS-HV-CLI-NOME, :WS-HV-CLI-SALDO,
+                    CURRENT DATE)
+           END-EXEC.
+
+           IF SQLCODE = 0
+               ADD 1 TO WS-TOT-INSERIDOS
+               DISPLAY "  STATUS: SUCESSO - CLIENTE INSERIDO"
+           ELSE
+               PERFORM 2600-REGISTRAR-ERRO-SQL
+           END-IF.
+
+      **************************************************************
+       2500-REGISTRAR-ERRO-NOME.
+           ADD 1 TO WS-TOT-ERROS
+           MOVE CLI-ID TO WS-HV-CLI-ID-ERRO
+           MOVE "NOME DO CLIENTE OBRIGATORIO" TO WS-HV-DESC-ERRO
+
+           DISPLAY "  STATUS: ERRO - NOME OBRIGATORIO NAO INFORMADO"
+
+           STRING "ERRO: NOME OBRIGATORIO - ID " CLI-ID
+               DELIMITED BY SIZE INTO REG-ERRO
+           WRITE REG-ERRO.
+
+           EXEC SQL
+               INSERT INTO ERROS_PROCESSAMENTO
+                   (CLI_ID, DESCRICAO_ERRO, DT_OCORRENCIA)
+                   VALUES
+                   (:WS-HV-CLI-ID-ERRO, :WS-HV-DESC-ERRO,
+                    CURRENT TIMESTAMP)
+           END-EXEC.
+
+      **************************************************************
+       2600-REGISTRAR-ERRO-SQL.
+           ADD 1 TO WS-TOT-ERROS
+           MOVE WS-HV-CLI-ID TO WS-HV-CLI-ID-ERRO
+
+           DISPLAY "  STATUS: ERRO SQL. SQLCODE: " SQLCODE
+
+           STRING "ERRO SQL - ID " WS-HV-CLI-ID
+               " SQLCODE: " SQLCODE
+               DELIMITED BY SIZE INTO REG-ERRO
+           WRITE REG-ERRO.
+
+           MOVE "ERRO SQL NO PROCESSAMENTO DO CLIENTE" TO
+               WS-HV-DESC-ERRO.
+
+           EXEC SQL ROLLBACK END-EXEC.
+
+           EXEC SQL
+               INSERT INTO ERROS_PROCESSAMENTO
+                   (CLI_ID, DESCRICAO_ERRO, DT_OCORRENCIA)
+                   VALUES
+                   (:WS-HV-CLI-ID-ERRO, :WS-HV-DESC-ERRO,
+                    CURRENT TIMESTAMP)
+           END-EXEC.
+
+      **************************************************************
+       2900-CONTROLAR-COMMIT.
+           ADD 1 TO WS-CONT-COMMIT.
+           IF WS-CONT-COMMIT >= 100
+               EXEC SQL COMMIT END-EXEC
+               MOVE 0 TO WS-CONT-COMMIT
+               DISPLAY "  >> COMMIT REALIZADO (100 REGISTROS) <<"
+           END-IF.
+
+      **************************************************************
+       3000-FINALIZAR.
+           EXEC SQL COMMIT END-EXEC.
+
+           CLOSE F-CLIENTES.
+           CLOSE F-ERROS.
+
+           EXEC SQL CONNECT RESET END-EXEC.
+
+           DISPLAY " ".
+           DISPLAY "***********************************************".
+           DISPLAY " ESTATISTICAS DE PROCESSAMENTO - CLILOAD".
+           DISPLAY "***********************************************".
+           DISPLAY " CLIENTES LIDOS..........: " WS-TOT-LIDOS.
+           DISPLAY " CLIENTES INSERIDOS......: " WS-TOT-INSERIDOS.
+           DISPLAY " CLIENTES ATUALIZADOS....: " WS-TOT-ATUALIZADOS.
+           DISPLAY " ERROS ENCONTRADOS.......: " WS-TOT-ERROS.
+           DISPLAY " ".
+           DISPLAY " FIM DO PROCESSAMENTO CLILOAD".
+           DISPLAY "***********************************************".

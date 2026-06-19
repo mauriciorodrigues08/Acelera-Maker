@@ -1,0 +1,304 @@
+      **************************************************************
+      * PROGRAMA: TRXPROC
+      * DESCRICAO: LE O ARQUIVO TRANSACOES.TXT, VALIDA AS REGRAS DE
+      *            NEGOCIO, ATUALIZA O SALDO DO CLIENTE NO DB2 E
+      *            REGISTRA A TRANSACAO NA TABELA TRANSACOES.
+      * REGRAS:
+      *   - CLIENTE DEVE EXISTIR NA TABELA CLIENTES
+      *   - TRX-TIPO DEVE SER 'C' (CREDITO) OU 'D' (DEBITO)
+      *   - TRX-VALOR DEVE SER MAIOR QUE ZERO
+      *   - DEBITO NAO PODE DEIXAR O SALDO NEGATIVO
+      *   - TRANSACAO SO E GRAVADA NA TABELA QUANDO VALIDA E APLICADA
+      *   - COMMIT A CADA 100 REGISTROS PROCESSADOS
+      *   - ROLLBACK EM CASO DE ERRO SQL
+      **************************************************************
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TRXPROC.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT F-TRANSACOES
+               ASSIGN TO "TRANSACOES.TXT"
+               ORGANIZATION IS LINE SEQUENTIAL
+               FILE STATUS IS WS-FS-TRANSACOES.
+
+           SELECT F-ERROS
+               ASSIGN TO "ERROS.TXT"
+               ORGANIZATION IS LINE SEQUENTIAL
+               FILE STATUS IS WS-FS-ERROS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  F-TRANSACOES.
+           COPY TRANSACAO.
+
+       FD  F-ERROS.
+       01  REG-ERRO                   PIC X(100).
+
+       WORKING-STORAGE SECTION.
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+
+      *--- AREA DE COMUNICACAO COM O DB2 (HOST VARIABLES) -----------
+           EXEC SQL BEGIN DECLARE SECTION END-EXEC.
+       01  WS-HV-CLI-ID                PIC S9(05) COMP-3.
+       01  WS-HV-CLI-SALDO             PIC S9(09) COMP-3.
+       01  WS-HV-TRX-ID                PIC S9(05) COMP-3.
+       01  WS-HV-TRX-TIPO              PIC X(01).
+       01  WS-HV-TRX-VALOR             PIC S9(09) COMP-3.
+       01  WS-HV-DESC-ERRO             PIC X(100).
+       01  WS-HV-CLI-ID-ERRO           PIC S9(05) COMP-3.
+           EXEC SQL END DECLARE SECTION END-EXEC.
+
+      *--- FLAGS E STATUS DE ARQUIVO ---------------------------------
+       01  WS-FS-TRANSACOES            PIC XX.
+       01  WS-FS-ERROS                 PIC XX.
+       01  WS-FIM-ARQUIVO              PIC X       VALUE 'N'.
+           88 FIM-DO-ARQUIVO                       VALUE 'S'.
+
+      *--- FLAGS DE VALIDACAO ------------------------------------------
+       01  WS-TRX-VALIDA               PIC X       VALUE 'S'.
+           88 TRANSACAO-VALIDA                     VALUE 'S'.
+           88 TRANSACAO-INVALIDA                   VALUE 'N'.
+
+      *--- CONTADORES / ESTATISTICAS -----------------------------------
+       01  WS-TOT-LIDAS                PIC 9(06)   VALUE ZERO.
+       01  WS-TOT-PROCESSADAS          PIC 9(06)   VALUE ZERO.
+       01  WS-TOT-CREDITOS             PIC 9(06)   VALUE ZERO.
+       01  WS-TOT-DEBITOS              PIC 9(06)   VALUE ZERO.
+       01  WS-TOT-ERROS                PIC 9(06)   VALUE ZERO.
+       01  WS-CONT-COMMIT              PIC 9(06)   VALUE ZERO.
+
+       PROCEDURE DIVISION.
+
+       0000-PRINCIPAL.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR UNTIL FIM-DO-ARQUIVO
+           PERFORM 3000-FINALIZAR
+           STOP RUN.
+
+      **************************************************************
+       1000-INICIALIZAR.
+           DISPLAY " ".
+           DISPLAY "=================================================".
+           DISPLAY " INICIANDO TRXPROC - PROCESSAMENTO DE TRANSACOES".
+           DISPLAY "=================================================".
+
+           EXEC SQL CONNECT TO BANCODB END-EXEC.
+           IF SQLCODE NOT = 0
+               DISPLAY "ERRO AO CONECTAR NO BANCODB. SQLCODE: " SQLCODE
+               STOP RUN
+           END-IF.
+
+           OPEN INPUT F-TRANSACOES.
+           IF WS-FS-TRANSACOES NOT = "00"
+               DISPLAY "ERRO AO ABRIR TRANSACOES.TXT. STATUS: "
+                   WS-FS-TRANSACOES
+               STOP RUN
+           END-IF.
+
+           OPEN EXTEND F-ERROS.
+           IF WS-FS-ERROS = "05" OR WS-FS-ERROS = "35"
+               OPEN OUTPUT F-ERROS
+           END-IF.
+
+           PERFORM 2100-LER-TRANSACAO.
+
+      **************************************************************
+       2000-PROCESSAR.
+           ADD 1 TO WS-TOT-LIDAS
+           SET TRANSACAO-VALIDA TO TRUE
+
+           DISPLAY "--------------------------------------------------".
+           DISPLAY "TRANSACAO: " TRX-ID " - CLIENTE: " TRX-CLI-ID
+               " - TIPO: " TRX-TIPO " - VALOR: " TRX-VALOR.
+
+           MOVE TRX-CLI-ID TO WS-HV-CLI-ID
+           MOVE TRX-ID     TO WS-HV-TRX-ID
+           MOVE TRX-TIPO   TO WS-HV-TRX-TIPO
+           MOVE TRX-VALOR  TO WS-HV-TRX-VALOR
+
+           PERFORM 2200-VALIDAR-CLIENTE
+
+           IF TRANSACAO-VALIDA
+               PERFORM 2300-VALIDAR-TIPO
+           END-IF
+
+           IF TRANSACAO-VALIDA
+               PERFORM 2400-VALIDAR-VALOR
+           END-IF
+
+           IF TRANSACAO-VALIDA
+               PERFORM 2500-VALIDAR-SALDO
+           END-IF
+
+           IF TRANSACAO-VALIDA
+               PERFORM 2600-APLICAR-TRANSACAO
+           END-IF
+
+           PERFORM 2900-CONTROLAR-COMMIT
+           PERFORM 2100-LER-TRANSACAO.
+
+      **************************************************************
+       2100-LER-TRANSACAO.
+           READ F-TRANSACOES
+               AT END
+                   MOVE 'S' TO WS-FIM-ARQUIVO
+           END-READ.
+
+           IF NOT FIM-DO-ARQUIVO
+               IF WS-FS-TRANSACOES NOT = "00"
+                   DISPLAY "ERRO DE LEITURA. STATUS: "
+                       WS-FS-TRANSACOES
+                   MOVE 'S' TO WS-FIM-ARQUIVO
+               END-IF
+           END-IF.
+
+      **************************************************************
+       2200-VALIDAR-CLIENTE.
+           EXEC SQL
+               SELECT CLI_SALDO INTO :WS-HV-CLI-SALDO
+               FROM CLIENTES
+               WHERE CLI_ID = :WS-HV-CLI-ID
+           END-EXEC.
+
+           IF SQLCODE = 100
+               SET TRANSACAO-INVALIDA TO TRUE
+               DISPLAY "  STATUS: ERRO - CLIENTE NAO ENCONTRADO"
+               MOVE "CLIENTE NAO ENCONTRADO" TO WS-HV-DESC-ERRO
+               PERFORM 2700-REGISTRAR-ERRO
+           ELSE
+               IF SQLCODE NOT = 0
+                   SET TRANSACAO-INVALIDA TO TRUE
+                   DISPLAY "  STATUS: ERRO SQL. SQLCODE: " SQLCODE
+                   MOVE "ERRO SQL AO BUSCAR CLIENTE" TO
+                       WS-HV-DESC-ERRO
+                   PERFORM 2700-REGISTRAR-ERRO
+               END-IF
+           END-IF.
+
+      **************************************************************
+       2300-VALIDAR-TIPO.
+           IF TRX-TIPO NOT = 'C' AND TRX-TIPO NOT = 'D'
+               SET TRANSACAO-INVALIDA TO TRUE
+               DISPLAY "  STATUS: ERRO - TIPO DE TRANSACAO INVALIDO"
+               MOVE "TIPO DE TRANSACAO INVALIDO" TO WS-HV-DESC-ERRO
+               PERFORM 2700-REGISTRAR-ERRO
+           END-IF.
+
+      **************************************************************
+       2400-VALIDAR-VALOR.
+           IF TRX-VALOR = ZERO
+               SET TRANSACAO-INVALIDA TO TRUE
+               DISPLAY "  STATUS: ERRO - VALOR DE TRANSACAO INVALIDO"
+               MOVE "VALOR DE TRANSACAO ZERADO" TO WS-HV-DESC-ERRO
+               PERFORM 2700-REGISTRAR-ERRO
+           END-IF.
+
+      **************************************************************
+       2500-VALIDAR-SALDO.
+           IF TRX-TIPO = 'D'
+               IF WS-HV-CLI-SALDO < WS-HV-TRX-VALOR
+                   SET TRANSACAO-INVALIDA TO TRUE
+                   DISPLAY "  STATUS: ERRO - SALDO INSUFICIENTE"
+                   MOVE "SALDO INSUFICIENTE" TO WS-HV-DESC-ERRO
+                   PERFORM 2700-REGISTRAR-ERRO
+               END-IF
+           END-IF.
+
+      **************************************************************
+       2600-APLICAR-TRANSACAO.
+           IF TRX-TIPO = 'C'
+               COMPUTE WS-HV-CLI-SALDO = WS-HV-CLI-SALDO +
+                   WS-HV-TRX-VALOR
+               ADD 1 TO WS-TOT-CREDITOS
+           ELSE
+               COMPUTE WS-HV-CLI-SALDO = WS-HV-CLI-SALDO -
+                   WS-HV-TRX-VALOR
+               ADD 1 TO WS-TOT-DEBITOS
+           END-IF
+
+           EXEC SQL
+               UPDATE CLIENTES
+                  SET CLI_SALDO = :WS-HV-CLI-SALDO,
+                      DT_ATUALIZACAO = CURRENT DATE
+                WHERE CLI_ID = :WS-HV-CLI-ID
+           END-EXEC.
+
+           IF SQLCODE NOT = 0
+               DISPLAY "  STATUS: ERRO SQL AO ATUALIZAR SALDO. "
+                   "SQLCODE: " SQLCODE
+               MOVE "ERRO SQL AO ATUALIZAR SALDO" TO WS-HV-DESC-ERRO
+               EXEC SQL ROLLBACK END-EXEC
+               PERFORM 2700-REGISTRAR-ERRO
+           ELSE
+               EXEC SQL
+                   INSERT INTO TRANSACOES
+                       (TRX_ID, CLI_ID, TRX_TIPO, TRX_VALOR,
+                        DT_PROCESSAMENTO)
+                       VALUES
+                       (:WS-HV-TRX-ID, :WS-HV-CLI-ID, :WS-HV-TRX-TIPO,
+                        :WS-HV-TRX-VALOR, CURRENT DATE)
+               END-EXEC
+
+               IF SQLCODE = 0
+                   ADD 1 TO WS-TOT-PROCESSADAS
+                   DISPLAY "  STATUS: SUCESSO - TRANSACAO APLICADA"
+               ELSE
+                   DISPLAY "  STATUS: ERRO SQL AO GRAVAR TRANSACAO. "
+                       "SQLCODE: " SQLCODE
+                   MOVE "ERRO SQL AO GRAVAR TRANSACAO" TO
+                       WS-HV-DESC-ERRO
+                   EXEC SQL ROLLBACK END-EXEC
+                   PERFORM 2700-REGISTRAR-ERRO
+               END-IF
+           END-IF.
+
+      **************************************************************
+       2700-REGISTRAR-ERRO.
+           ADD 1 TO WS-TOT-ERROS
+           MOVE WS-HV-CLI-ID TO WS-HV-CLI-ID-ERRO
+
+           STRING "ERRO: " WS-HV-DESC-ERRO " - ID " TRX-CLI-ID
+               " TRX " TRX-ID
+               DELIMITED BY SIZE INTO REG-ERRO
+           WRITE REG-ERRO.
+
+           EXEC SQL
+               INSERT INTO ERROS_PROCESSAMENTO
+                   (CLI_ID, DESCRICAO_ERRO, DT_OCORRENCIA)
+                   VALUES
+                   (:WS-HV-CLI-ID-ERRO, :WS-HV-DESC-ERRO,
+                    CURRENT TIMESTAMP)
+           END-EXEC.
+
+      **************************************************************
+       2900-CONTROLAR-COMMIT.
+           ADD 1 TO WS-CONT-COMMIT.
+           IF WS-CONT-COMMIT >= 100
+               EXEC SQL COMMIT END-EXEC
+               MOVE 0 TO WS-CONT-COMMIT
+               DISPLAY "  >> COMMIT REALIZADO (100 REGISTROS) <<"
+           END-IF.
+
+      **************************************************************
+       3000-FINALIZAR.
+           EXEC SQL COMMIT END-EXEC.
+
+           CLOSE F-TRANSACOES.
+           CLOSE F-ERROS.
+
+           EXEC SQL CONNECT RESET END-EXEC.
+
+           DISPLAY " ".
+           DISPLAY "***********************************************".
+           DISPLAY " ESTATISTICAS DE PROCESSAMENTO - TRXPROC".
+           DISPLAY "***********************************************".
+           DISPLAY " TRANSACOES LIDAS........: " WS-TOT-LIDAS.
+           DISPLAY " TRANSACOES PROCESSADAS..: " WS-TOT-PROCESSADAS.
+           DISPLAY " CREDITOS PROCESSADOS....: " WS-TOT-CREDITOS.
+           DISPLAY " DEBITOS PROCESSADOS.....: " WS-TOT-DEBITOS.
+           DISPLAY " ERROS ENCONTRADOS.......: " WS-TOT-ERROS.
+           DISPLAY " ".
+           DISPLAY " FIM DO PROCESSAMENTO TRXPROC".
+           DISPLAY "***********************************************".
