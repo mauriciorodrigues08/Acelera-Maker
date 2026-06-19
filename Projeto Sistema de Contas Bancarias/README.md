@@ -6,22 +6,6 @@ Sistema batch em COBOL que processa diariamente um arquivo de clientes e um arqu
 
 ---
 
-## Sumário
-
-- [Visão geral](#-visão-geral)
-- [Arquitetura e fluxo](#-arquitetura-e-fluxo)
-- [Estrutura do projeto](#-estrutura-do-projeto)
-- [Modelo de dados (DB2)](#-modelo-de-dados-db2)
-- [Programas](#-programas)
-- [Regras de negócio](#-regras-de-negócio)
-- [Códigos de retorno (RC)](#-códigos-de-retorno-rc)
-- [Arquivos de entrada e saída](#-arquivos-de-entrada-e-saída)
-- [Como executar](#-como-executar)
-- [Prints da execução](#-prints-da-execução)
-- [Possíveis melhorias](#-possíveis-melhorias)
-
----
-
 ## Visão geral
 
 O banco precisa processar diariamente um arquivo com as movimentações (débito e crédito) de seus clientes. Os dados cadastrais ficam armazenados em tabelas DB2 e devem ser mantidos atualizados conforme as transações são processadas.
