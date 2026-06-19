@@ -1,7 +1,6 @@
       **************************************************************
       * PROGRAMA: CLILOAD
-      * DESCRICAO: LE O ARQUIVO CLIENTES.TXT
-      *     CARREGA/ATUALIZA A
+      * DESCRICAO: LE O ARQUIVO CLIENTES.TXT E CARREGA/ATUALIZA A
       *            TABELA CLIENTES NO DB2.
       * REGRAS:
       *   - NOME OBRIGATORIO (NAO PODE SER BRANCO)
@@ -64,6 +63,10 @@
       *--- AUXILIARES DE EXIBICAO / LOG --------------------------------
        01  WS-LINHA-LOG                PIC X(100).
        01  WS-CLI-ID-EDIT              PIC 9(05).
+
+      *--- CALCULO DO PERCENTUAL DE ERRO / RETURN-CODE -----------------
+       01  WS-PCT-ERRO                 PIC 9(03)V9(02) VALUE ZERO.
+       01  WS-LIMITE-PCT-ERRO          PIC 9(03)       VALUE 20.
 
        PROCEDURE DIVISION.
 
@@ -247,6 +250,8 @@
 
            EXEC SQL CONNECT RESET END-EXEC.
 
+           PERFORM 3100-CALCULAR-RETURN-CODE
+
            DISPLAY " ".
            DISPLAY "***********************************************".
            DISPLAY " ESTATISTICAS DE PROCESSAMENTO - CLILOAD".
@@ -255,6 +260,26 @@
            DISPLAY " CLIENTES INSERIDOS......: " WS-TOT-INSERIDOS.
            DISPLAY " CLIENTES ATUALIZADOS....: " WS-TOT-ATUALIZADOS.
            DISPLAY " ERROS ENCONTRADOS.......: " WS-TOT-ERROS.
+           DISPLAY " PERCENTUAL DE ERRO......: " WS-PCT-ERRO "%".
+           DISPLAY " RETURN-CODE.............: " RETURN-CODE.
            DISPLAY " ".
            DISPLAY " FIM DO PROCESSAMENTO CLILOAD".
            DISPLAY "***********************************************".
+
+      **************************************************************
+       3100-CALCULAR-RETURN-CODE.
+           IF WS-TOT-LIDOS > ZERO
+               COMPUTE WS-PCT-ERRO =
+                   (WS-TOT-ERROS * 100) / WS-TOT-LIDOS
+           ELSE
+               MOVE ZERO TO WS-PCT-ERRO
+           END-IF.
+
+           EVALUATE TRUE
+               WHEN WS-TOT-ERROS = ZERO
+                   MOVE 0 TO RETURN-CODE
+               WHEN WS-PCT-ERRO > WS-LIMITE-PCT-ERRO
+                   MOVE 8 TO RETURN-CODE
+               WHEN OTHER
+                   MOVE 4 TO RETURN-CODE
+           END-EVALUATE.

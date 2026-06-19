@@ -69,6 +69,10 @@
        01  WS-TOT-ERROS                PIC 9(06)   VALUE ZERO.
        01  WS-CONT-COMMIT              PIC 9(06)   VALUE ZERO.
 
+      *--- CALCULO DO PERCENTUAL DE ERRO / RETURN-CODE -----------------
+       01  WS-PCT-ERRO                 PIC 9(03)V9(02) VALUE ZERO.
+       01  WS-LIMITE-PCT-ERRO          PIC 9(03)       VALUE 20.
+
        PROCEDURE DIVISION.
 
        0000-PRINCIPAL.
@@ -290,6 +294,8 @@
 
            EXEC SQL CONNECT RESET END-EXEC.
 
+           PERFORM 3100-CALCULAR-RETURN-CODE
+
            DISPLAY " ".
            DISPLAY "***********************************************".
            DISPLAY " ESTATISTICAS DE PROCESSAMENTO - TRXPROC".
@@ -299,6 +305,26 @@
            DISPLAY " CREDITOS PROCESSADOS....: " WS-TOT-CREDITOS.
            DISPLAY " DEBITOS PROCESSADOS.....: " WS-TOT-DEBITOS.
            DISPLAY " ERROS ENCONTRADOS.......: " WS-TOT-ERROS.
+           DISPLAY " PERCENTUAL DE ERRO......: " WS-PCT-ERRO "%".
+           DISPLAY " RETURN-CODE.............: " RETURN-CODE.
            DISPLAY " ".
            DISPLAY " FIM DO PROCESSAMENTO TRXPROC".
            DISPLAY "***********************************************".
+
+      **************************************************************
+       3100-CALCULAR-RETURN-CODE.
+           IF WS-TOT-LIDAS > ZERO
+               COMPUTE WS-PCT-ERRO =
+                   (WS-TOT-ERROS * 100) / WS-TOT-LIDAS
+           ELSE
+               MOVE ZERO TO WS-PCT-ERRO
+           END-IF.
+
+           EVALUATE TRUE
+               WHEN WS-TOT-ERROS = ZERO
+                   MOVE 0 TO RETURN-CODE
+               WHEN WS-PCT-ERRO > WS-LIMITE-PCT-ERRO
+                   MOVE 8 TO RETURN-CODE
+               WHEN OTHER
+                   MOVE 4 TO RETURN-CODE
+           END-EVALUATE.
