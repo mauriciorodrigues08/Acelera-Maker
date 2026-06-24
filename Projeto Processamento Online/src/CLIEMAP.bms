@@ -1,0 +1,174 @@
+*----------------------------------------------------------------*
+* CLIEMAP.BMS - MAPA BMS DA TRANSACAO CLIE                      *
+* Programa : CLIPGM                                              *
+* Mapset   : CLIESET                                             *
+* Mapa     : CLIEMAP                                             *
+*                                                                *
+* Tela Esperada (80 colunas x 24 linhas - Terminal 3270):       *
+*                                                                *
+* Linha  1: ****************************************            *
+* Linha  2: * CONSULTA DE CLIENTES               *              *
+* Linha  3: ****************************************            *
+* Linha  5: Codigo Cliente: ______                              *
+* Linha  7: Nome.........: ______________________               *
+* Linha  9: Telefone......: ______________                       *
+* Linha 11: Cidade........: ____________________                 *
+* Linha 13: Mensagem......: ____________________                 *
+* Linha 16: PF3=Sair                                            *
+* Linha 17: PF5=Consultar                                       *
+* Linha 18: PF6=Salvar                                          *
+*                                                                *
+* ATENCAO: Artefato de DESIGN - nao compilavel.                 *
+* Sem tradutor CICS/BMS disponivel no ambiente.                 *
+* Macros: DFHMSD, DFHMDI, DFHMDF                                *
+*----------------------------------------------------------------*
+
+*----------------------------------------------------------------*
+* DFHMSD - Define o MAPSET                                       *
+*----------------------------------------------------------------*
+CLIESET  DFHMSD TYPE=&SYSPARM,                                         X
+               LANG=COBOL,                                             X
+               MODE=INOUT,                                             X
+               TERM=3270-2,                                            X
+               CTRL=FREEKB,                                            X
+               STORAGE=AUTO,                                           X
+               TIOAPFX=YES
+
+*----------------------------------------------------------------*
+* DFHMDI - Define o MAPA fisico (24 linhas x 80 colunas)        *
+*----------------------------------------------------------------*
+CLIEMAP  DFHMDI SIZE=(24,80),                                          X
+               LINE=1,                                                 X
+               COLUMN=1
+
+*----------------------------------------------------------------*
+* Linha 1 - Borda superior do cabecalho                          *
+*----------------------------------------------------------------*
+         DFHMDF POS=(1,1),                                             X
+               LENGTH=40,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='****************************************'
+
+*----------------------------------------------------------------*
+* Linha 2 - Titulo da tela                                       *
+*----------------------------------------------------------------*
+         DFHMDF POS=(2,1),                                             X
+               LENGTH=1,                                               X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='*'
+
+         DFHMDF POS=(2,3),                                             X
+               LENGTH=22,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='CONSULTA DE CLIENTES'
+
+         DFHMDF POS=(2,40),                                            X
+               LENGTH=1,                                               X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='*'
+
+*----------------------------------------------------------------*
+* Linha 3 - Borda inferior do cabecalho                          *
+*----------------------------------------------------------------*
+         DFHMDF POS=(3,1),                                             X
+               LENGTH=40,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='****************************************'
+
+*----------------------------------------------------------------*
+* Linha 5 - Campo CODIGO DO CLIENTE                              *
+* Rotulo: col 1, campo editavel: col 17 (apos "Codigo Cliente: ")*
+*----------------------------------------------------------------*
+         DFHMDF POS=(5,1),                                             X
+               LENGTH=16,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='Codigo Cliente: '
+
+CODCLI   DFHMDF POS=(5,17),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(NORM,UNPROT,NUM),                                X
+               PICIN='9(6)',                                            X
+               PICOUT='9(6)'
+
+*----------------------------------------------------------------*
+* Linha 7 - Campo NOME DO CLIENTE                                *
+* Rotulo: col 1, campo editavel: col 15 (apos "Nome.........: ")*
+*----------------------------------------------------------------*
+         DFHMDF POS=(7,1),                                             X
+               LENGTH=14,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='Nome.........: '
+
+NOME     DFHMDF POS=(7,15),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(NORM,UNPROT),                                    X
+               PICIN='X(30)',                                           X
+               PICOUT='X(30)'
+
+*----------------------------------------------------------------*
+* Linha 9 - Campo TELEFONE                                       *
+* Rotulo: col 1, campo editavel: col 15 (apos "Telefone......: ")*
+*----------------------------------------------------------------*
+         DFHMDF POS=(9,1),                                             X
+               LENGTH=14,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='Telefone......: '
+
+TELEFONE DFHMDF POS=(9,15),                                            X
+               LENGTH=15,                                              X
+               ATTRB=(NORM,UNPROT),                                    X
+               PICIN='X(15)',                                           X
+               PICOUT='X(15)'
+
+*----------------------------------------------------------------*
+* Linha 11 - Campo CIDADE                                        *
+* Rotulo: col 1, campo editavel: col 15 (apos "Cidade........: ")*
+*----------------------------------------------------------------*
+         DFHMDF POS=(11,1),                                            X
+               LENGTH=14,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='Cidade........: '
+
+CIDADE   DFHMDF POS=(11,15),                                           X
+               LENGTH=20,                                              X
+               ATTRB=(NORM,UNPROT),                                    X
+               PICIN='X(20)',                                           X
+               PICOUT='X(20)'
+
+*----------------------------------------------------------------*
+* Linha 13 - Campo MENSAGEM DO SISTEMA (saida, PROT)             *
+* Rotulo: col 1, campo de saida: col 15                         *
+*----------------------------------------------------------------*
+         DFHMDF POS=(13,1),                                            X
+               LENGTH=14,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='Mensagem......: '
+
+MENSAGEM DFHMDF POS=(13,15),                                           X
+               LENGTH=30,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               PICOUT='X(30)'
+
+*----------------------------------------------------------------*
+* Linhas 16-18 - Instrucoes de teclas de funcao                  *
+*----------------------------------------------------------------*
+         DFHMDF POS=(16,1),                                            X
+               LENGTH=8,                                               X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='PF3=Sair'
+
+         DFHMDF POS=(17,1),                                            X
+               LENGTH=12,                                              X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='PF5=Consultar'
+
+         DFHMDF POS=(18,1),                                            X
+               LENGTH=9,                                               X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='PF6=Salvar'
+
+*----------------------------------------------------------------*
+* Fim do mapset                                                  *
+*----------------------------------------------------------------*
+         DFHMSD TYPE=FINAL
+         END

@@ -1,0 +1,32 @@
+# Massa de dados de referência — Arquivo VSAM CLIENTES
+# Layout: CODCLI(6) | NOME(30) | TELEFONE(15) | CIDADE(20)
+# Separador: pipe "|" (apenas para leitura humana; no VSAM é posicional)
+#
+# Col  1- 6  : CODCLI
+# Col  7-36  : NOME
+# Col 37-51  : TELEFONE
+# Col 52-71  : CIDADE
+
+CODCLI|NOME                          |TELEFONE       |CIDADE              
+------|------------------------------|---------------|--------------------
+000001|JOAO DA SILVA                 |(35)99100-1111 |POUSO ALEGRE        
+000002|MARIA OLIVEIRA SANTOS         |(35)99200-2222 |VARGINHA            
+000003|CARLOS EDUARDO LIMA           |(31)98300-3333 |BELO HORIZONTE      
+000004|ANA PAULA FERREIRA            |(11)97400-4444 |SAO PAULO           
+000005|PEDRO HENRIQUE COSTA          |(21)96500-5555 |RIO DE JANEIRO      
+000006|LUCIA MENDES ROCHA            |(35)95600-6666 |ITAJUBA             
+000007|ROBERTO ALVES NETO            |(37)94700-7777 |DIVINOPOLIS         
+000008|FERNANDA XAVIER PINTO         |(32)93800-8888 |JUIZ DE FORA        
+000009|MARCOS ANTONIO SOUZA          |(35)92900-9999 |ALFENAS             
+000010|PATRICIA GOMES VIEIRA         |(35)91000-0000 |TRES CORACOES       
+
+# --- Casos de borda para testes ---
+
+# Cliente com nome longo (limite 30)
+000099|BARTHOLOMEU CAVALCANTE RIBEIRO|(35)99999-9999 |CAMBUQUIRA          
+
+# Cliente com cidade longa (limite 20)
+000098|JOSE PEREIRA                  |(11)98888-8888 |SAO JOSE DOS CAMPOS 
+
+# Código máximo de 6 dígitos
+999999|TESTE LIMITE SUPERIOR         |(00)00000-0000 |TESTE               
