@@ -312,7 +312,7 @@ completo confirmou que a correção não afetou os demais cenários.
   tratado como sequencial + tabela em memória, e não como um arquivo
   indexado com gravação imediata por chave.
 
-  ---
+---
 
-  ## Autor
-  Maurício Rodrigues
+## Autor
+Maurício Rodrigues
