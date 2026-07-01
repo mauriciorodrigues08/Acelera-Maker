@@ -55,6 +55,15 @@ A aplicação .NET nunca acessa o banco de dados diretamente — toda leitura e 
 - `ATUALIZA_CLIENTE` desativa o autocommit (`SQL_ATTR_AUTOCOMMIT = SQL_AUTOCOMMIT_OFF`) e controla a transação manualmente, fazendo `COMMIT` apenas se a atualização afetar pelo menos uma linha (`SQLRowCount`), e `ROLLBACK` em caso de cliente não encontrado ou erro.
 - Códigos de retorno padronizados em `PIC X(2)`, inspirados nos return codes COBOL tradicionais: `"00"` = sucesso, `"04"` = cliente não encontrado, `"08"` = erro de conexão/execução.
 
+### 3.4 Formato de troca de dados entre .NET e COBOL
+ 
+**Decisão:** JSON via `stdin`/`stdout` do processo COBOL.
+ 
+**Alternativas consideradas:**
+- *Argumentos de linha de comando*: simples de implementar, mas limitado em tamanho e não extensível — adicionar um campo novo exigiria alterar a assinatura do processo e recompilar ambos os lados.
+- *Arquivo temporário*: mais fácil de depurar (o arquivo fica em disco e pode ser inspecionado), mas reintroduz I/O de disco a cada operação — justamente o problema que levou à rejeição da comunicação via arquivo na decisão 3.1.
+**Justificativa da escolha:** JSON via `stdin`/`stdout` é o formato mais alinhado com o conceito de API REST estudado no curso (JSON como padrão de troca de dados), extensível sem quebrar versões anteriores, e não adiciona I/O de disco. A estrutura completa dos JSONs de entrada e saída está definida em [`estrutura-compartilhada.md`](./estrutura-compartilhada.md).
+
 **Justificativa:** esse padrão isola toda a complexidade de acesso a dados em uma camada própria, deixando os programas COBOL "de aplicação" simples (apenas chamam a rotina e tratam o status de retorno), o que atende ao requisito não funcional de estrutura organizada e de fácil manutenção.
 
 ## 4. Validação experimental (testes de viabilidade técnica)
