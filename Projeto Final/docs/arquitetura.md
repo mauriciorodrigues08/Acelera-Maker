@@ -1,6 +1,6 @@
 # Documento de Arquitetura
 
-> Documento atualizado incrementalmente ao longo do desenvolvimento, registrando cada decisão técnica tomada.
+> Documento vivo — atualizado incrementalmente ao longo do desenvolvimento, registrando cada decisão técnica no momento em que foi tomada.
 
 ## 1. Contexto e objetivo
 
@@ -13,12 +13,18 @@ A Cooperativa Financeira Alfa mantém um sistema legado em COBOL responsável pe
       │
       ▼
 [ Aplicação .NET ]  ── chama via Process.Start ──▶  [ Executável COBOL ]
-                                                            │
-                                                            ▼
-                                                   [ Wrapper C / ODBC ]
-                                                            │
-                                                            ▼
-                                                     [ Banco SQLite ]
+                             JSON (stdin)               │
+                             JSON (stdout)              ▼
+                                                    [ LER_ENTRADA / ESCREVER_SAIDA ]
+                                                        │
+                                                        ▼
+                                                    [ CONSULTA_CLIENTE / ATUALIZA_CLIENTE ]
+                                                        │
+                                                        ▼
+                                                    [ Wrapper C / ODBC ]
+                                                        │
+                                                        ▼
+                                                    [ Banco SQLite ]
 ```
 
 A aplicação .NET nunca acessa o banco de dados diretamente — toda leitura e escrita passa pelo componente COBOL, que continua sendo a única fonte de verdade dos dados cadastrais. Isso preserva o requisito de negócio de manter o processamento existente.
@@ -41,58 +47,114 @@ A aplicação .NET nunca acessa o banco de dados diretamente — toda leitura e 
 
 **Alternativas consideradas:**
 - *DB2 real*: representaria com mais fidelidade o cenário de mainframe estudado (z/OS Connect + DB2), mas exigiria provisionamento de uma instância DB2 (licenciada ou via container), o que adiciona uma dependência de infraestrutura desproporcional ao escopo e ao tempo disponível para o projeto.
-- *Arquivo sequencial/indexado nativo do COBOL* (`ORGANIZATION INDEXED`, simulando VSAM): opção mais simples e totalmente nativa do COBOL, mas sem transações ACID nem consultas diretas por índice secundário — ficou registrada como plano B caso a configuração ODBC não fosse viável a tempo.
+- *Arquivo sequencial/indexado nativo do COBOL* (`ORGANIZATION INDEXED`, simulando VSAM): opção mais simples e totalmente nativa do COBOL, mas sem transações ACID nem consultas diretas por índice — ficou registrada como plano B caso a configuração ODBC não fosse viável a tempo.
 - *`EXEC SQL` embutido do GnuCOBOL*: **testado e descartado**. O pré-compilador SQL do GnuCOBOL (`-fsqldb`) suporta apenas MySQL, MSSQL e Oracle — não há suporte nativo a SQLite. Essa limitação foi confirmada experimentalmente antes de se prosseguir com a alternativa de wrapper C/ODBC.
 
-**Justificativa da escolha:** SQLite oferece transações ACID (atendendo ao requisito de "persistir as alterações realizadas" de forma confiável) e consulta direta por chave, sem a complexidade de provisionar um SGBD completo. O acesso via wrapper C/ODBC foi validado experimentalmente (ver seção 4) e reproduz, em escala reduzida, o padrão real usado em integrações mainframe-banco de dados (rotina externa chamada via `CALL`, análoga a como um programa COBOL chamaria uma stored procedure ou um módulo de acesso a dados em ambiente z/OS).
+**Justificativa da escolha:** SQLite oferece transações ACID (atendendo ao requisito de "persistir as alterações realizadas" de forma confiável) e consulta direta por chave, sem a complexidade de provisionar um SGBD completo. O acesso via wrapper C/ODBC reproduz, em escala reduzida, o padrão real usado em integrações mainframe-banco de dados (rotina externa chamada via `CALL`, análoga a como um programa COBOL chamaria um módulo de acesso a dados em ambiente z/OS).
 
 ### 3.3 Padrão de integração COBOL ↔ banco de dados
 
-**Decisão:** rotinas em C (`sqlitebridge.c`) compiladas como objeto e linkadas ao executável COBOL, expondo funções (`CONSULTA_CLIENTE`, `ATUALIZA_CLIENTE`) chamadas via `CALL ... USING` com parâmetros passados por referência.
+**Decisão:** rotinas em C (`sqlitebridge.c`) compiladas como objeto e linkadas ao executável COBOL, expondo funções chamadas via `CALL ... USING` com parâmetros passados por referência.
+
+**Funções implementadas:**
+
+| Função C | Chamada COBOL | Responsabilidade |
+|---|---|---|
+| `LER_ENTRADA` | `CALL 'LER_ENTRADA' USING ...` | Lê JSON do `stdin` e preenche campos COBOL |
+| `ESCREVER_SAIDA` | `CALL 'ESCREVER_SAIDA' USING ...` | Monta JSON com os campos COBOL e escreve no `stdout` |
+| `CONSULTA_CLIENTE` | `CALL 'CONSULTA_CLIENTE' USING ...` | Busca cliente por código via ODBC |
+| `ATUALIZA_CLIENTE` | `CALL 'ATUALIZA_CLIENTE' USING ...` | Atualiza telefone e e-mail via ODBC com commit/rollback |
 
 **Detalhes técnicos:**
-- Cada função abre sua própria conexão ODBC (`SQLConnect` ao DSN `clientesDB`), executa a operação e libera os handles ao final — sem manter conexão persistente entre chamadas.
+- Cada função de banco abre sua própria conexão ODBC, executa a operação e libera os handles ao final — sem manter conexão persistente entre chamadas.
 - `ATUALIZA_CLIENTE` desativa o autocommit (`SQL_ATTR_AUTOCOMMIT = SQL_AUTOCOMMIT_OFF`) e controla a transação manualmente, fazendo `COMMIT` apenas se a atualização afetar pelo menos uma linha (`SQLRowCount`), e `ROLLBACK` em caso de cliente não encontrado ou erro.
 - Códigos de retorno padronizados em `PIC X(2)`, inspirados nos return codes COBOL tradicionais: `"00"` = sucesso, `"04"` = cliente não encontrado, `"08"` = erro de conexão/execução.
 
+**Justificativa:** esse padrão isola toda a complexidade de acesso a dados e de I/O JSON em uma camada própria (o `sqlitebridge.c`), deixando o programa COBOL principal (`clientes.cob`) focado apenas na lógica de negócio — atende ao requisito não funcional de estrutura organizada e de fácil manutenção.
+
 ### 3.4 Formato de troca de dados entre .NET e COBOL
- 
+
 **Decisão:** JSON via `stdin`/`stdout` do processo COBOL.
- 
+
 **Alternativas consideradas:**
 - *Argumentos de linha de comando*: simples de implementar, mas limitado em tamanho e não extensível — adicionar um campo novo exigiria alterar a assinatura do processo e recompilar ambos os lados.
 - *Arquivo temporário*: mais fácil de depurar (o arquivo fica em disco e pode ser inspecionado), mas reintroduz I/O de disco a cada operação — justamente o problema que levou à rejeição da comunicação via arquivo na decisão 3.1.
+
 **Justificativa da escolha:** JSON via `stdin`/`stdout` é o formato mais alinhado com o conceito de API REST estudado no curso (JSON como padrão de troca de dados), extensível sem quebrar versões anteriores, e não adiciona I/O de disco. A estrutura completa dos JSONs de entrada e saída está definida em [`estrutura-compartilhada.md`](./estrutura-compartilhada.md).
 
-**Justificativa:** esse padrão isola toda a complexidade de acesso a dados em uma camada própria, deixando os programas COBOL "de aplicação" simples (apenas chamam a rotina e tratam o status de retorno), o que atende ao requisito não funcional de estrutura organizada e de fácil manutenção.
+### 3.5 Automação de build (Makefile)
 
-## 4. Validação experimental (testes de viabilidade técnica)
+**Decisão:** uso de `Makefile` para automatizar compilação, inicialização do banco e execução de testes.
 
-Antes de assumir essa arquitetura como definitiva, foram realizados testes isolados para confirmar viabilidade:
+**Justificativa:** o processo de compilação envolve dois passos distintos (`gcc` para o wrapper C e `cobc` para o COBOL) com flags e dependências específicas. Sem automação, qualquer erro nos comandos ou esquecimento da ordem correta quebraria o build. O `Makefile` resolve isso e também exporta automaticamente a variável `ODBCINI`, eliminando uma fonte comum de erro durante o desenvolvimento. A adoção de `Makefile` está alinhada com os conceitos de DevOps e automação de build estudados no curso (Semana 10, Dia 4).
 
-| Teste | Resultado |
+**Alvos disponíveis:**
+
+| Alvo | Descrição |
 |---|---|
-| `EXEC SQL` com SQLite no GnuCOBOL | ❌ Não suportado (`-fsqldb` aceita apenas MySQL/MSSQL/Oracle) |
-| Conexão ODBC ao SQLite via `isql` | ✅ Conectado e consulta retornada com sucesso |
-| COBOL chamando wrapper C (`CONSULTA_CLIENTE`) | ✅ Dados retornados corretamente |
-| COBOL chamando wrapper C (`ATUALIZA_CLIENTE`) | ✅ Persistência confirmada via consulta posterior ao banco |
-| Cenário cliente não encontrado | ✅ Status `"04"` retornado corretamente, sem falso positivo |
+| `make` / `make all` | Compila o wrapper C e o programa COBOL, gerando `build/clientes` |
+| `make clean` | Remove todos os artefatos de `build/` |
+| `make db-init` | Cria a tabela e popula o banco com 3 clientes de exemplo |
+| `make run-consulta` | Testa consulta de cliente existente (código 1) |
+| `make run-atualiza` | Testa atualização de telefone/e-mail e confirma com consulta |
+| `make run-nao-encontrado` | Testa resposta para cliente inexistente (código 99) |
+| `make test` | Executa todos os testes acima em sequência |
 
-Esses testes foram conduzidos no ambiente de desenvolvimento (WSL Ubuntu 24.04, GnuCOBOL 3.1.2.0) antes da implementação dos programas finais, reduzindo o risco de retrabalho arquitetural nas fases seguintes.
+**Comportamento de recompilação incremental:** o `make` recompila apenas o arquivo modificado — se só o `clientes.cob` for alterado, o `sqlitebridge.c` não é recompilado, e vice-versa.
 
-## 5. Estrutura de componentes (a atualizar)
+## 4. Programa COBOL principal (clientes.cob)
 
-| Componente | Responsabilidade | Status |
+O programa `clientes.cob` é o ponto de entrada do componente legado. Ele é responsável por:
+
+1. Chamar `LER_ENTRADA` para ler e interpretar o JSON recebido via `stdin`
+2. Identificar a operação solicitada (`"C"` = consulta, `"A"` = atualização) usando level-88 (`88 OP-CONSULTA VALUE 'C'`)
+3. Direcionar para o parágrafo correspondente (`EXECUTAR-CONSULTA` ou `EXECUTAR-ATUALIZA`) via `EVALUATE TRUE`
+4. Chamar `ESCREVER_SAIDA` para formatar e emitir o JSON de resposta via `stdout`
+
+**Estrutura de parágrafos:**
+
+| Parágrafo | Responsabilidade |
+|---|---|
+| `PROCEDURE DIVISION` principal | Orquestração geral: leitura → decisão → escrita |
+| `EXECUTAR-CONSULTA` | Chama `CONSULTA_CLIENTE` e define mensagem/flag de retorno |
+| `EXECUTAR-ATUALIZA` | Chama `ATUALIZA_CLIENTE` e define mensagem/flag de retorno |
+| `ESCREVER-E-SAIR` | Trata erros críticos (leitura inválida, operação desconhecida) e encerra |
+
+**Uso de level-88 para legibilidade:** em vez de comparar strings diretamente (`IF WS-STATUS = "00"`), o programa declara condições nomeadas (`88 STATUS-OK VALUE '00'`) e usa `EVALUATE TRUE / WHEN STATUS-OK`, tornando o código mais próximo da linguagem de negócio e mais fácil de manter.
+
+## 5. Validação experimental
+
+| Teste | Ambiente | Resultado |
 |---|---|---|
-| `sqlitebridge.c` | Ponte ODBC entre COBOL e SQLite | ✅ Implementado e testado |
-| Programa COBOL principal | Receber parâmetros do processo .NET e orquestrar consulta/atualização | ⏳ Pendente (Fase 5) |
-| Estrutura compartilhada | Contrato de dados entre .NET e COBOL | ⏳ Pendente (Fase 4) |
-| Aplicação .NET | Interface de atendimento, chamada do processo COBOL | ⏳ Pendente (Fase 6/7) |
+| `EXEC SQL` com SQLite no GnuCOBOL | WSL Ubuntu 24.04, GnuCOBOL 3.1.2.0 | ❌ Não suportado |
+| Conexão ODBC ao SQLite via `isql` | WSL Ubuntu 24.04 | ✅ Sucesso |
+| COBOL chamando `CONSULTA_CLIENTE` | WSL Ubuntu 24.04 | ✅ Dados retornados corretamente |
+| COBOL chamando `ATUALIZA_CLIENTE` | WSL Ubuntu 24.04 | ✅ Persistência confirmada |
+| Cenário cliente não encontrado | WSL Ubuntu 24.04 | ✅ Status `"04"` retornado corretamente |
+| Programa principal lendo JSON do `stdin` | WSL Ubuntu 24.04 | ✅ Todos os cenários validados |
+| Programa principal escrevendo JSON no `stdout` | WSL Ubuntu 24.04 | ✅ JSON bem formado em todos os cenários |
+| `make test` completo | WSL Ubuntu 24.04 | ✅ Todos os alvos executados com sucesso |
 
-## 6. Fluxo de execução (a detalhar conforme Fase 6)
+## 6. Estrutura de componentes
+
+| Componente | Arquivo | Responsabilidade | Status |
+|---|---|---|---|
+| Wrapper ODBC + I/O JSON | `src/sqlitebridge.c` | Leitura/escrita JSON + acesso ao SQLite via ODBC | ✅ Implementado e testado |
+| Programa COBOL principal | `src/clientes.cob` | Orquestrar consulta/atualização conforme operação recebida | ✅ Implementado e testado |
+| Banco de dados | `data/clientes.db` | Persistência dos dados cadastrais | ✅ Criado via `make db-init` |
+| Automação de build | `Makefile` | Compilação, inicialização do banco e testes | ✅ Implementado e testado |
+| Estrutura compartilhada | `docs/estrutura-compartilhada.md` | Contrato de dados entre .NET e COBOL | ✅ Documentado |
+| Aplicação .NET | `dotnet/` | Interface de atendimento, chamada do processo COBOL | ⏳ Pendente (Fase 6/7) |
+
+## 7. Fluxo de execução (a completar na Fase 6)
 
 Pendente: descrever passo a passo como uma requisição do atendente percorre .NET → processo COBOL → wrapper C → SQLite e retorna.
 
-## 7. Riscos e mitigações registrados
+## 8. Riscos e mitigações
 
-- **Risco:** configuração ODBC/SQLite poderia não funcionar a tempo. **Mitigação planejada:** plano B com arquivo indexado COBOL (`ORGANIZATION INDEXED`), simulando VSAM. **Status:** mitigação não foi necessária — configuração ODBC validada com sucesso.
+| Risco | Mitigação planejada | Status |
+|---|---|---|
+| Configuração ODBC/SQLite inviável a tempo | Plano B: arquivo indexado COBOL (`ORGANIZATION INDEXED`) | ✅ Não foi necessário — ODBC validado |
+| `EXEC SQL` sem suporte a SQLite no GnuCOBOL | Wrapper C/ODBC como camada de acesso | ✅ Implementado e funcionando |
+| Variável `ODBCINI` não definida em sessão nova | `Makefile` exporta automaticamente antes de cada execução | ✅ Resolvido no Makefile |
+| .NET precisa definir `ODBCINI` ao chamar o processo COBOL | Setar variável de ambiente no `ProcessStartInfo` | ⏳ A implementar na Fase 6 |

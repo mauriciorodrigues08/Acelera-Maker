@@ -6,16 +6,16 @@ Solução de modernização do cadastro de clientes da Cooperativa Financeira Al
 
 ## Status do projeto
 
-Em desenvolvimento. Última atualização: configuração de persistência (SQLite + ODBC) validada.
+Em desenvolvimento. Última atualização: componente COBOL principal implementado e testado.
 
 ## Pré-requisitos
 
 - WSL (Ubuntu 24.04) ou Linux equivalente
-- GnuCOBOL (testado com 3.1.2.0 e 4.0-early)
+- GnuCOBOL (testado com 3.1.2.0)
 - unixODBC + driver `libsqliteodbc`
 - SQLite3
-- .NET SDK (versão a definir na Fase 7)
-- gcc (para compilar o wrapper de integração COBOL ↔ SQLite)
+- gcc + make
+- .NET SDK (a instalar na Fase 7)
 
 ## Setup do ambiente
 
@@ -23,70 +23,86 @@ Em desenvolvimento. Última atualização: configuração de persistência (SQLi
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y gnucobol4 libsqliteodbc unixodbc unixodbc-dev odbcinst sqlite3 gcc
+sudo apt-get install -y gnucobol libsqliteodbc unixodbc unixodbc-dev odbcinst sqlite3 gcc make
 ```
 
-### 2. Criar o banco de dados local
-
-```bash
-sqlite3 clientes.db "CREATE TABLE clientes (codigo INTEGER PRIMARY KEY, nome TEXT, telefone TEXT, email TEXT);"
-```
-
-### 3. Configurar o DSN ODBC (arquivo `odbc.ini` na raiz do projeto)
+### 2. Configurar o DSN ODBC (arquivo `odbc.ini` na raiz do projeto)
 
 ```bash
 echo "[clientesDB]" > odbc.ini
 echo "Description = SQLite3 clientes" >> odbc.ini
 echo "Driver = SQLite3" >> odbc.ini
-echo "Database = $(pwd)/clientes.db" >> odbc.ini
+echo "Database = $(pwd)/data/clientes.db" >> odbc.ini
 ```
 
-> O caminho gerado deve ser absoluto. Se a pasta do projeto tiver espaços no nome (ex.: `Projeto Final`), teste a conexão antes de seguir (passo 5).
+> O caminho deve ser absoluto. Confirme com `cat odbc.ini` antes de prosseguir.
 
-### 4. Definir a variável de ambiente do ODBC
-
-Antes de compilar ou executar qualquer programa COBOL que acesse o banco, exporte:
+### 3. Validar a conexão ODBC (recomendado na primeira vez)
 
 ```bash
 export ODBCINI="$(pwd)/odbc.ini"
-```
-
-> Essa variável precisa estar definida em toda sessão de terminal nova. Considere adicioná-la ao `.bashrc` do ambiente de desenvolvimento, ou ao script de execução do projeto.
-
-### 5. Validar a conexão ODBC
-
-```bash
-echo "SELECT * FROM clientes;" | isql clientesDB -v
+echo "SELECT 1;" | isql clientesDB -v
 ```
 
 Deve retornar `Connected!`. Se der erro `[IM002]` ou `connect failed`, revise o `odbc.ini` e confirme que o driver está registrado com `odbcinst -q -d`.
 
-## Compilação
+## Compilação e execução (via Makefile)
+
+> O `Makefile` exporta `ODBCINI` automaticamente — não é necessário exportar manualmente antes de rodar os alvos.
+
+### Primeira vez
 
 ```bash
-gcc -c src/sqlitebridge.c -o sqlitebridge.o
-cobc -x -free src/<programa>.cob sqlitebridge.o -o <executavel> -lodbc
+make db-init   # cria o banco e popula com dados de exemplo
+make           # compila o wrapper C e o programa COBOL
 ```
+
+### Testar
+
+```bash
+make test      # roda todos os cenários de teste em sequência
+```
+
+### Todos os alvos disponíveis
+
+| Alvo | Descrição |
+|---|---|
+| `make` | Compila tudo, gera `build/clientes` |
+| `make clean` | Remove artefatos de `build/` |
+| `make db-init` | Cria tabela e insere 3 clientes de exemplo |
+| `make run-consulta` | Testa consulta de cliente existente (código 1) |
+| `make run-atualiza` | Testa atualização de telefone/e-mail e confirma com consulta |
+| `make run-nao-encontrado` | Testa resposta para cliente inexistente (código 99) |
+| `make test` | Executa todos os testes acima em sequência |
 
 ## Estrutura do repositório
 
 ```
-/
+Projeto Final/
+├── Makefile                      # automação de build e testes
 ├── README.md
-├── odbc.ini
-├── clientes.db
+├── .gitignore
+├── odbc.ini                      # DSN ODBC (gerado no setup)
 ├── src/
-│   ├── sqlitebridge.c        # wrapper ODBC chamado pelo COBOL via CALL
-│   └── *.cob                 # programas COBOL
+│   ├── clientes.cob              # programa COBOL principal
+│   ├── sqlitebridge.c            # wrapper C: ODBC + I/O JSON
+│   ├── teste-consulta.cob        # programa de teste isolado
+│   └── teste-atualiza.cob        # programa de teste isolado
+├── build/                        # gerado pelo make — não versionado
+│   ├── sqlitebridge.o
+│   └── clientes
+├── data/
+│   └── clientes.db               # banco SQLite
 ├── docs/
 │   ├── arquitetura.md
 │   ├── estrutura-compartilhada.md
 │   ├── plano-de-testes.md
-│   └── relatorio-ia.md
-├── dotnet/                   # aplicação .NET (a definir — Fase 7)
-└── tests/                    # testes automatizados (a definir — Fase 8)
+│   ├── relatorio-ia.md
+│   └── Projeto Final Cobol.pdf   # enunciado do projeto
+├── dotnet/                       # aplicação .NET (Fase 7)
+└── tests/                        # testes automatizados (Fase 8)
 ```
 
-## Como executar (a atualizar conforme o projeto avança)
+## Como executar (a completar na Fase 6)
 
 Pendente: instruções de execução do fluxo completo .NET → COBOL → SQLite.
