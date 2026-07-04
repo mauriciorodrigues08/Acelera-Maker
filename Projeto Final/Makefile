@@ -19,13 +19,13 @@ COBCFLAGS = -x -free
 LIBS    = -lodbc
 
 # ── Diretorios ─────────────────────────────────────────────────
-SRC_DIR   = src
+COBOL_DIR   = cobol
 BUILD_DIR = build
 DATA_DIR  = data
 
 # ── Arquivos fonte ──────────────────────────────────────────────
-C_SRC     = $(SRC_DIR)/sqlitebridge.c
-COB_SRC   = $(SRC_DIR)/clientes.cob
+C_SRC     = $(COBOL_DIR)/sqlitebridge.c
+COB_SRC   = $(COBOL_DIR)/clientes.cob
 
 # ── Artefatos de build ──────────────────────────────────────────
 C_OBJ     = $(BUILD_DIR)/sqlitebridge.o

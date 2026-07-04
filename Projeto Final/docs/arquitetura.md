@@ -13,18 +13,18 @@ A Cooperativa Financeira Alfa mantém um sistema legado em COBOL responsável pe
       │
       ▼
 [ Aplicação .NET ]  ── chama via Process.Start ──▶  [ Executável COBOL ]
-                             JSON (stdin)               │
-                             JSON (stdout)              ▼
-                                                    [ LER_ENTRADA / ESCREVER_SAIDA ]
-                                                        │
-                                                        ▼
-                                                    [ CONSULTA_CLIENTE / ATUALIZA_CLIENTE ]
-                                                        │
-                                                        ▼
+                             JSON (stdin)                    │
+                             JSON (stdout)                   ▼
+                                              [ LER_ENTRADA / ESCREVER_SAIDA ]
+                                                             │
+                                                             ▼
+                                          [ CONSULTA_CLIENTE / ATUALIZA_CLIENTE ]
+                                                             │
+                                                             ▼
                                                     [ Wrapper C / ODBC ]
-                                                        │
-                                                        ▼
-                                                    [ Banco SQLite ]
+                                                             │
+                                                             ▼
+                                                      [ Banco SQLite ]
 ```
 
 A aplicação .NET nunca acessa o banco de dados diretamente — toda leitura e escrita passa pelo componente COBOL, que continua sendo a única fonte de verdade dos dados cadastrais. Isso preserva o requisito de negócio de manter o processamento existente.
@@ -82,7 +82,40 @@ A aplicação .NET nunca acessa o banco de dados diretamente — toda leitura e 
 
 **Justificativa da escolha:** JSON via `stdin`/`stdout` é o formato mais alinhado com o conceito de API REST estudado no curso (JSON como padrão de troca de dados), extensível sem quebrar versões anteriores, e não adiciona I/O de disco. A estrutura completa dos JSONs de entrada e saída está definida em [`estrutura-compartilhada.md`](./estrutura-compartilhada.md).
 
-### 3.5 Automação de build (Makefile)
+### 3.5 Tipo de projeto .NET e ambiente de execução
+
+**Decisão:** Web API ASP.NET Core 8, rodando no WSL (mesmo ambiente do componente COBOL).
+
+**Alternativas consideradas:**
+- *Console App*: simples de implementar, mas não atende ao requisito de "interface que facilite a utilização pelo usuário" nem ao de "garantir que a solução possa ser utilizada futuramente por outras aplicações".
+- *.NET no Windows chamando o COBOL via WSL (`wsl.exe ...`)*: possível, mas frágil — depende de caminhos corretos entre os dois sistemas de arquivos e adiciona uma camada extra sem benefício técnico.
+- *Compilar o COBOL para Windows (GnuCOBOL + MinGW)*: viável, mas repetiria todo o trabalho de configuração do ODBC já validado no Linux.
+
+**Justificativa da escolha:** rodar o .NET no WSL elimina a barreira entre os dois ambientes — o `Process.Start` chama o executável COBOL diretamente, sem intermediários, com o mesmo filesystem e as mesmas variáveis de ambiente. A Web API expõe os endpoints via HTTP, tornando a solução consumível por qualquer cliente (browser, mobile, outro sistema), atendendo diretamente ao requisito de "futura integração com outros sistemas".
+
+### 3.6 Estrutura da Web API (.NET)
+
+**Decisão:** organização em três camadas dentro do projeto `CooperativaAlfa`:
+
+| Camada | Arquivo | Responsabilidade |
+|---|---|---|
+| Models | `ClienteDto.cs` | Representa os dados do cliente na resposta HTTP |
+| Models | `AtualizaClienteRequest.cs` | Payload do `PUT` com validações via DataAnnotations |
+| Models | `CobolResponse.cs` | Desserializa o JSON retornado pelo processo COBOL |
+| Services | `CobolBridge.cs` | Encapsula toda a lógica de `Process.Start`, stdin/stdout e erros |
+| Controllers | `ClientesController.cs` | Mapeia rotas HTTP para chamadas ao `CobolBridge` |
+
+**Detalhe crítico — variável `ODBCINI`:** o processo COBOL filho não herda automaticamente as variáveis de ambiente da sessão do terminal. Por isso, o `CobolBridge` define explicitamente `ODBCINI` no `ProcessStartInfo.Environment` antes de iniciar o processo, garantindo que o driver ODBC consiga localizar o DSN independentemente de como a API foi iniciada.
+
+**Mapeamento de status COBOL → HTTP:**
+
+| Status COBOL | HTTP Status | Significado |
+|---|---|---|
+| `"00"` | 200 OK | Operação realizada com sucesso |
+| `"04"` | 404 Not Found | Cliente não encontrado |
+| `"08"` | 500 Internal Server Error | Erro interno no sistema legado |
+
+### 3.7 Automação de build (Makefile)
 
 **Decisão:** uso de `Makefile` para automatizar compilação, inicialização do banco e execução de testes.
 
@@ -134,21 +167,21 @@ O programa `clientes.cob` é o ponto de entrada do componente legado. Ele é res
 | Programa principal lendo JSON do `stdin` | WSL Ubuntu 24.04 | ✅ Todos os cenários validados |
 | Programa principal escrevendo JSON no `stdout` | WSL Ubuntu 24.04 | ✅ JSON bem formado em todos os cenários |
 | `make test` completo | WSL Ubuntu 24.04 | ✅ Todos os alvos executados com sucesso |
+| `GET /clientes/1` via Swagger | WSL .NET 8.0.422 + browser Windows | ✅ HTTP 200, dados do cliente retornados |
+| `PUT /clientes/1` via Swagger | WSL .NET 8.0.422 + browser Windows | ✅ HTTP 200, "Dados atualizados com sucesso." |
+| `GET /clientes/99` via Swagger | WSL .NET 8.0.422 + browser Windows | ✅ HTTP 404, "Cliente nao encontrado." |
+| `ODBCINI` definido pelo `CobolBridge` no `ProcessStartInfo` | WSL | ✅ Processo COBOL conectou ao SQLite sem export manual |
 
 ## 6. Estrutura de componentes
 
 | Componente | Arquivo | Responsabilidade | Status |
 |---|---|---|---|
-| Wrapper ODBC + I/O JSON | `src/sqlitebridge.c` | Leitura/escrita JSON + acesso ao SQLite via ODBC | ✅ Implementado e testado |
-| Programa COBOL principal | `src/clientes.cob` | Orquestrar consulta/atualização conforme operação recebida | ✅ Implementado e testado |
+| Wrapper ODBC + I/O JSON | `cobol/sqlitebridge.c` | Leitura/escrita JSON + acesso ao SQLite via ODBC | ✅ Implementado e testado |
+| Programa COBOL principal | `cobol/clientes.cob` | Orquestrar consulta/atualização conforme operação recebida | ✅ Implementado e testado |
 | Banco de dados | `data/clientes.db` | Persistência dos dados cadastrais | ✅ Criado via `make db-init` |
 | Automação de build | `Makefile` | Compilação, inicialização do banco e testes | ✅ Implementado e testado |
 | Estrutura compartilhada | `docs/estrutura-compartilhada.md` | Contrato de dados entre .NET e COBOL | ✅ Documentado |
-| Aplicação .NET | `dotnet/` | Interface de atendimento, chamada do processo COBOL | ⏳ Pendente (Fase 6/7) |
-
-## 7. Fluxo de execução (a completar na Fase 6)
-
-Pendente: descrever passo a passo como uma requisição do atendente percorre .NET → processo COBOL → wrapper C → SQLite e retorna.
+| Web API .NET | `dotnet/CooperativaAlfa/` | Interface HTTP, `CobolBridge`, endpoints GET e PUT | ✅ Implementado e testado |
 
 ## 8. Riscos e mitigações
 
@@ -157,4 +190,40 @@ Pendente: descrever passo a passo como uma requisição do atendente percorre .N
 | Configuração ODBC/SQLite inviável a tempo | Plano B: arquivo indexado COBOL (`ORGANIZATION INDEXED`) | ✅ Não foi necessário — ODBC validado |
 | `EXEC SQL` sem suporte a SQLite no GnuCOBOL | Wrapper C/ODBC como camada de acesso | ✅ Implementado e funcionando |
 | Variável `ODBCINI` não definida em sessão nova | `Makefile` exporta automaticamente antes de cada execução | ✅ Resolvido no Makefile |
-| .NET precisa definir `ODBCINI` ao chamar o processo COBOL | Setar variável de ambiente no `ProcessStartInfo` | ⏳ A implementar na Fase 6 |
+| .NET precisa definir `ODBCINI` ao chamar o processo COBOL | Setar variável de ambiente no `ProcessStartInfo` | ✅ Implementado no CobolBridge |
+
+## 7. Fluxo de execução completo
+
+Sequência de uma requisição de consulta (`GET /clientes/1`) percorrendo toda a solução:
+
+```
+1. Atendente abre o browser e acessa http://localhost:5210
+2. Swagger renderiza a interface — atendente clica em GET /clientes/{codigo}
+3. HTTP GET /clientes/1 chega ao ClientesController (.NET)
+4. Controller valida o parâmetro (codigo > 0) e chama CobolBridge.ConsultarClienteAsync(1)
+5. CobolBridge serializa o JSON de entrada: {"operacao":"C","codigo":1}
+6. CobolBridge cria um ProcessStartInfo apontando para build/clientes
+   - RedirectStandardInput = true
+   - RedirectStandardOutput = true
+   - Environment["ODBCINI"] = caminho do odbc.ini
+7. Process.Start() inicia o executável COBOL como processo filho
+8. CobolBridge escreve o JSON no stdin do processo e fecha o stream
+9. clientes.cob recebe o JSON via LER_ENTRADA (função C)
+   - Extrai operacao = "C" e codigo = 000000001
+10. EVALUATE TRUE → WHEN OP-CONSULTA → PERFORM EXECUTAR-CONSULTA
+11. EXECUTAR-CONSULTA chama CONSULTA_CLIENTE (função C via CALL)
+12. CONSULTA_CLIENTE abre conexão ODBC com o DSN "clientesDB"
+    - SQLConnect → driver SQLite → abre data/clientes.db
+    - SELECT nome, telefone, email WHERE codigo = 1
+    - SQLFetch → retorna os dados do cliente
+    - SQLDisconnect → libera handles
+    - Status retornado: "00"
+13. clientes.cob preenche WS-MENSAGEM = "Cliente encontrado." e WS-INCLUIR-DADOS = "S"
+14. Chama ESCREVER_SAIDA (função C) que monta e imprime o JSON no stdout
+15. CobolBridge lê o stdout do processo e aguarda o encerramento (WaitForExitAsync)
+16. CobolBridge desserializa o JSON em CobolResponse
+17. ClientesController mapeia CobolResponse para ClienteDto e retorna HTTP 200
+18. Swagger exibe o JSON de resposta para o atendente
+```
+
+O fluxo de atualização (`PUT /clientes/1`) segue o mesmo caminho, com `operacao = "A"` e a chamada sendo direcionada para `ATUALIZA_CLIENTE`, que executa um `UPDATE` transacional com commit explícito.
