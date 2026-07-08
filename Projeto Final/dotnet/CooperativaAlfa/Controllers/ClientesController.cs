@@ -13,10 +13,10 @@ namespace CooperativaAlfa.Controllers;
 [Produces("application/json")]
 public class ClientesController : ControllerBase
 {
-    private readonly CobolBridge _cobol;
+    private readonly ICobolBridge _cobol;
     private readonly ILogger<ClientesController> _logger;
 
-    public ClientesController(CobolBridge cobol, ILogger<ClientesController> logger)
+    public ClientesController(ICobolBridge cobol, ILogger<ClientesController> logger)
     {
         _cobol  = cobol;
         _logger = logger;

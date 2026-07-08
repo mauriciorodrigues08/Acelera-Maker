@@ -24,7 +24,7 @@ builder.Services.AddSwaggerGen(c =>
 
 // CobolBridge registrado como Transient:
 // cada requisição cria sua própria instância e seu próprio processo COBOL
-builder.Services.AddTransient<CobolBridge>();
+builder.Services.AddTransient<ICobolBridge, CobolBridge>();
 
 // ── Pipeline ────────────────────────────────────────────────────
 var app = builder.Build();
@@ -39,3 +39,6 @@ app.UseSwaggerUI(c =>
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+// Necessário para o WebApplicationFactory conseguir referenciar o projeto principal nos testes de integração.
+public partial class Program { }

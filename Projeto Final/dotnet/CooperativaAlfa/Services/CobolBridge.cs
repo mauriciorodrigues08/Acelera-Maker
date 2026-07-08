@@ -13,7 +13,7 @@ namespace CooperativaAlfa.Services;
 /// toda operação de dados passa pelo componente COBOL, que é a fonte
 /// de verdade do sistema legado.
 /// </summary>
-public class CobolBridge
+public class CobolBridge : ICobolBridge
 {
     private readonly string _executablePath;
     private readonly string _odbcIniPath;
@@ -35,7 +35,7 @@ public class CobolBridge
     /// <summary>
     /// Executa uma consulta de cliente pelo código.
     /// </summary>
-    public async Task<CobolResponse> ConsultarClienteAsync(int codigo)
+    virtual public async Task<CobolResponse> ConsultarClienteAsync(int codigo)
     {
         var input = JsonSerializer.Serialize(new
         {
@@ -49,7 +49,7 @@ public class CobolBridge
     /// <summary>
     /// Executa a atualização de telefone e e-mail de um cliente.
     /// </summary>
-    public async Task<CobolResponse> AtualizarClienteAsync(
+    virtual public async Task<CobolResponse> AtualizarClienteAsync(
         int codigo, string telefone, string email)
     {
         var input = JsonSerializer.Serialize(new

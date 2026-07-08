@@ -1,0 +1,9 @@
+global using Xunit;
+global using Moq;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Testing;
+global using Microsoft.Extensions.DependencyInjection;
+global using CooperativaAlfa.Models;
+global using CooperativaAlfa.Services;
+global using CooperativaAlfa.Tests.Helpers;
+global using Microsoft.Extensions.Configuration;

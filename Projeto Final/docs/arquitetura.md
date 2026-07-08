@@ -227,3 +227,25 @@ Sequência de uma requisição de consulta (`GET /clientes/1`) percorrendo toda 
 ```
 
 O fluxo de atualização (`PUT /clientes/1`) segue o mesmo caminho, com `operacao = "A"` e a chamada sendo direcionada para `ATUALIZA_CLIENTE`, que executa um `UPDATE` transacional com commit explícito.
+
+## 8. Testes automatizados
+ 
+### Estratégia adotada
+ 
+O projeto adota dois níveis de testes automatizados com xUnit, sem dependência de infraestrutura (COBOL, SQLite ou ODBC):
+ 
+**Testes unitários (xUnit + Moq):** testam `ClientesController` e `CobolResponse` isoladamente. O `ICobolBridge` é mockado, permitindo controlar exatamente o que o COBOL "retornaria" em cada cenário sem precisar do executável real.
+ 
+**Testes de integração (xUnit + WebApplicationFactory):** sobem a API ASP.NET Core em memória e fazem requisições HTTP reais. O `ICobolBridge` é substituído no container de DI por um mock, testando o pipeline HTTP completo (roteamento, validação de ModelState, serialização JSON) sem dependência externa.
+ 
+### Decisão: interface `ICobolBridge`
+ 
+Para permitir o mock do `CobolBridge` nos testes, foi extraída a interface `ICobolBridge` com os métodos `ConsultarClienteAsync` e `AtualizarClienteAsync`. O controller passou a depender da interface em vez da classe concreta, seguindo o princípio de inversão de dependência. Isso também facilita futura substituição da implementação (ex.: trocar `Process.Start` por chamada direta a uma DLL COBOL).
+ 
+### Resultado
+ 
+| Nível | Testes | Passando |
+|---|---|---|
+| Unitário | 14 | ✅ 14 |
+| Integração | 9 | ✅ 9 |
+| **Total** | **23** | **✅ 23** |
