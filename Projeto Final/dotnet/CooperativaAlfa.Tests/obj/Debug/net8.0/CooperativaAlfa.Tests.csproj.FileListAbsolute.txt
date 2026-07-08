@@ -418,3 +418,4 @@
 /mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa.Tests/obj/Debug/net8.0/CooperativaAlfa.Tests.pdb
 /mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa.Tests/obj/Debug/net8.0/CooperativaAlfa.Tests.genruntimeconfig.cache
 /mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa.Tests/obj/Debug/net8.0/ref/CooperativaAlfa.Tests.dll
+/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa.Tests/bin/Debug/net8.0/CooperativaAlfa.staticwebassets.runtime.json
