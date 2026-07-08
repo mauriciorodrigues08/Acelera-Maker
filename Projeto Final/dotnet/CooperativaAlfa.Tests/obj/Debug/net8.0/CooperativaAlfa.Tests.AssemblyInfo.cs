@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CooperativaAlfa.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3a213614bf797257ba25dd488b35b753ddf694be")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+64c2e9735d730fa3df20e0827704caab8d13894b")]
 [assembly: System.Reflection.AssemblyProductAttribute("CooperativaAlfa.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CooperativaAlfa.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
