@@ -1,11 +1,77 @@
 {
   "Version": 1,
-  "Hash": "INDqwuAZ8+aQNs4IVg0F1G0d+/yhn0PajHoVLTPSzEs=",
+  "Hash": "Pj+QvNsxRIshogf+xKfSKz/+DY3Kpgm0n5QHgfLhjM8=",
   "Source": "CooperativaAlfa",
   "BasePath": "_content/CooperativaAlfa",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "CooperativaAlfa/wwwroot",
+      "Source": "CooperativaAlfa",
+      "ContentRoot": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/",
+      "BasePath": "_content/CooperativaAlfa",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/app.js",
+      "SourceId": "CooperativaAlfa",
+      "SourceType": "Discovered",
+      "ContentRoot": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/",
+      "BasePath": "_content/CooperativaAlfa",
+      "RelativePath": "app.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/app.js"
+    },
+    {
+      "Identity": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/index.html",
+      "SourceId": "CooperativaAlfa",
+      "SourceType": "Discovered",
+      "ContentRoot": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/",
+      "BasePath": "_content/CooperativaAlfa",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/index.html"
+    },
+    {
+      "Identity": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/style.css",
+      "SourceId": "CooperativaAlfa",
+      "SourceType": "Discovered",
+      "ContentRoot": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/",
+      "BasePath": "_content/CooperativaAlfa",
+      "RelativePath": "style.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/style.css"
+    }
+  ]
 }

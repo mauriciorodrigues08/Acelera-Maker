@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cooperativa Alfa — Cadastro de Clientes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Cooperativa Alfa</div>
+    <div class="subtitle">Sistema de Cadastro de Clientes</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Busca -->
+  <div class="card">
+    <h2>Consultar cliente</h2>
+    <div class="search-row">
+      <input id="inputCodigo" type="number" min="1"
+             placeholder="Digite o código do cliente" />
+      <button class="btn-primary" onclick="buscar()" id="btnBuscar">
+        Buscar
+      </button>
+    </div>
+    <div id="alertaBusca" class="alert alert-busca"></div>
+  </div>
+
+  <!-- Dados do cliente -->
+  <div class="card client-card" id="cardCliente">
+    <h2>Dados cadastrais</h2>
+
+    <div class="client-header">
+      <div class="avatar" id="avatarLetra">?</div>
+      <div>
+        <div class="client-name" id="clienteNome">—</div>
+        <div class="client-code" id="clienteCodigo">Código: —</div>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <span class="field-icon">📞</span>
+        <div>
+          <div class="field-label">Telefone</div>
+          <div class="field-value" id="clienteTelefone">—</div>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-icon">✉️</span>
+        <div>
+          <div class="field-label">E-mail</div>
+          <div class="field-value" id="clienteEmail">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="client-actions">
+      <button class="btn-secondary" onclick="abrirEdicao()">
+        ✏️ Editar contato
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulário de edição -->
+  <div class="card edit-form" id="formEdicao">
+    <h2>Atualizar dados de contato</h2>
+
+    <div class="form-group">
+      <label for="inputTelefone">Telefone</label>
+      <input id="inputTelefone" type="tel"
+             placeholder="Somente dígitos (10 a 15)" maxlength="15" />
+      <div class="hint">Somente números, sem espaços ou traços.</div>
+    </div>
+
+    <div class="form-group">
+      <label for="inputEmail">E-mail</label>
+      <input id="inputEmail" type="email"
+             placeholder="exemplo@email.com" maxlength="60" />
+    </div>
+
+    <div id="alertaEdicao" class="alert"></div>
+
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="cancelarEdicao()">
+        Cancelar
+      </button>
+      <button class="btn-success" onclick="salvar()" id="btnSalvar">
+        💾 Salvar
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<footer>Cooperativa Alfa © 2026 — Sistema Legado COBOL + API .NET</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

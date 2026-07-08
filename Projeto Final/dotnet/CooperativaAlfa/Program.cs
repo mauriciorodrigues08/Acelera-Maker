@@ -33,9 +33,11 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cooperativa Alfa v1");
-    c.RoutePrefix = string.Empty; // Swagger na raiz: http://localhost:5210
+    c.RoutePrefix = "swagger";
 });
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

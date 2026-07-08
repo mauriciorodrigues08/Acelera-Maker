@@ -1,0 +1,33 @@
+{
+  "Files": [
+    {
+      "Id": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/app.js",
+      "PackagePath": "staticwebassets/app.js"
+    },
+    {
+      "Id": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/index.html",
+      "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "/mnt/c/Users/mauri/OneDrive/Documentos/GitHub/Acelera-Maker/Projeto Final/dotnet/CooperativaAlfa/wwwroot/style.css",
+      "PackagePath": "staticwebassets/style.css"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.CooperativaAlfa.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.CooperativaAlfa.props",
+      "PackagePath": "build\\CooperativaAlfa.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.CooperativaAlfa.props",
+      "PackagePath": "buildMultiTargeting\\CooperativaAlfa.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.CooperativaAlfa.props",
+      "PackagePath": "buildTransitive\\CooperativaAlfa.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
